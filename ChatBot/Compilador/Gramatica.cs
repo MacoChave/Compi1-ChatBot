@@ -7,324 +7,402 @@ namespace ChatBot.Compilador
 	{
 		public Gramatica() : base(caseSensitive: true)
 		{
-			#region ER
-			NumberLiteral numero = TerminalFactory.CreateCSharpNumber("numero");
-			IdentifierTerminal id = new IdentifierTerminal("id");
-			StringLiteral cadena = TerminalFactory.CreateCSharpString("string");
-			StringLiteral caracter = TerminalFactory.CreateCSharpChar("caracter");
+            #region ER
+            /*NUMERO ENTERO*/
+            RegexBasedTerminal numentero = new RegexBasedTerminal("Int", "[0-9]+");
 
-			CommentTerminal lineComment = new CommentTerminal("lcmt", "//", "\n", "\r\n");
-			CommentTerminal blockComment = new CommentTerminal("bcmt", "/*", "*/");
-			#endregion
+            /*NUMERO DECIMAL*/
+            RegexBasedTerminal numdecimal = new RegexBasedTerminal("double", "[0-9]+[.][0-9]+");
 
-			#region TERMINALES
-			/* IMPORT */
-			var tkImport = ToTerm("Import");
-			var tkPutoComa = ToTerm(";");
+            /*IDENTIFICADOR*/
+            IdentifierTerminal id = new IdentifierTerminal("id");
 
-			/* BLOQUE */
-			var tkAPar = ToTerm("(");
-			var tkCPar = ToTerm(")");
-			var tkALlav = ToTerm("{");
-			var tkCLlav = ToTerm("}");
+            /*STRING*/
+            //CommentTerminal cadena = new CommentTerminal("String", "\"", ".", "\"");
+            StringLiteral cadena = TerminalFactory.CreateCSharpString("String");
+            /*STRING*/
+            CommentTerminal importaciones = new CommentTerminal("String", "\"", ".[.].", "\"");
 
-			/* ARITMETICA */
-			var tkMas = ToTerm("+");
-			var tkMenos = ToTerm("-");
-			var tkPor = ToTerm("*");
-			var tkDiv = ToTerm("/");
-			var tkMod = ToTerm("%");
-			var tkPot = ToTerm("^");
+            /*CHAR*/
+            StringLiteral caracter = TerminalFactory.CreateCSharpChar("Char");
 
-			/* RELACIONALES */
-			var tkEquiv = ToTerm("==");
-			var tkDif = ToTerm("!=");
-			var tkMenor = ToTerm("<");
-			var tkMayor = ToTerm(">");
-			var tkMenorIgual = ToTerm("<=");
-			var tkMayorIgual = ToTerm(">=");
-
-			/* LOGICAS */
-			var tkAnd = ToTerm("&&");
-			var tkOr = ToTerm("||");
-			var tkXor = ToTerm("|&");
-			var tkNot = ToTerm("!");
-
-            var tkIncremento = ToTerm("++");
-            var tkDecremento = ToTerm("--");
-
-			/* VARIABLES */
-			var tkPts = ToTerm(":");
-            var tkPt = ToTerm(".");
-			var tkIgual = ToTerm("=");
-			var tkACor = ToTerm("[");
-			var tkCCor = ToTerm("]");
-			var tkComa = ToTerm(",");
-
-			/* TIPOS DE DATOS */
-			var tkInt = ToTerm("Int");
-			var tkDouble = ToTerm("Double");
-			var tkString = ToTerm("String");
-			var tkChar = ToTerm("Char");
-			var tkBoolean = ToTerm("Boolean");
-			var tkTrue = ToTerm("True");
-			var tkFalse = ToTerm("False");
-
-			/* RESERVADAS */
-			var tkRetorno = ToTerm("Return");
-			var tkVoid = ToTerm("Void");
-			var tkMaint = ToTerm("Main");
-			var tkBrak = ToTerm("Break");
-
-			/* SENTENCIAS */
-			var tkIf = ToTerm("If");
-			var tkElse = ToTerm("Else");
-			var tkSwitch = ToTerm("Switch");
-			var tkCase = ToTerm("Case");
-			var tkDefault = ToTerm("Default");
-			var tkFor = ToTerm("For");
-			var tkWhile = ToTerm("While");
-			var tkDo = ToTerm("Do");
-
-			/* NATIVAS */
-			var tkPrint = ToTerm("Print");
-			var tkCompare = ToTerm("CompareTo");
-			var tkGetUser = ToTerm("GetUser");
+            CommentTerminal comentarioLinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n");
+            CommentTerminal comentarioBloque = new CommentTerminal("comentarioBloque", "/*", "*/");
             #endregion
 
-            #region NO TERMINALES
-            NonTerminal INICIO = new NonTerminal("INICIO"),
-                LIST_IMPORT = new NonTerminal("LIST_IMPORT"),
-                IMPORT = new NonTerminal("IMPORT"),
-                LIST_CUERPO = new NonTerminal("LIST_CUERPO"),
-                CUERPO = new NonTerminal("CUERPO"),
-                ASIGNACION_CORTO = new NonTerminal("ASIGNACION_CORTO"),
-                OP = new NonTerminal("OP"),
-                C = new NonTerminal("C"),
-                R = new NonTerminal("R"),
-                L = new NonTerminal("L"),
-                E = new NonTerminal("E"),
-                INVOCAR = new NonTerminal("INVOCAR"),
-                LIST_ATRIBUTO = new NonTerminal("LIST_ATRIBUTO"),
-                ATRIBUTO = new NonTerminal("ATRIBUTO"),
-				DECLARACION = new NonTerminal("DECLARACION"),
-                ASIGNACION = new NonTerminal("ASIGNACION"),
-                TIPO_ASIGNACION = new NonTerminal("TIPO_ASIGNACION"),
-                TIPO_DECLARACION = new NonTerminal("TIPO_DECLARACION"),
-                VAR_LINEAL = new NonTerminal("VAR_LINEAL"),
-				VAR_VECTOR = new NonTerminal("VAR_VECTOR"),
-                VALOR_LINEAL = new NonTerminal("VALOR_LINEAL"),
-                VALOR_VECTOR = new NonTerminal("VALOR_VECTOR"),
-                TIPO_VALOR = new NonTerminal("TIPO_VALOR"),
-                ASIGNAR_LINEAL = new NonTerminal("ASIGNAR_LINEAL"),
-                ASIGNAR_VECTOR = new NonTerminal("ASIGNAR_VECTOR"),
-                ACCESO_VECTOR = new NonTerminal("ACCESO_VECTOR"),
-                LIST_E = new NonTerminal("LIST_E"),
-                LIST_ID = new NonTerminal("LIST_ID"),
-                METODO = new NonTerminal("METODO"),
-                LIST_PARAMETRO = new NonTerminal("LIST_PARAMETRO"),
-                PARAMETRO = new NonTerminal("PARAMETRO"),
-                LIST_SENTENCIA = new NonTerminal("LIST_SENTENCIA"),
-                SENTENCIA = new NonTerminal("SENTENCIA"),
-                IF = new NonTerminal("IF"),
-                IF_AUX = new NonTerminal("IF_AUX"),
-                SENTPRIMA = new NonTerminal("SENTPRIMA"),
-                ELSE = new NonTerminal("ELSE"),
-                FOR = new NonTerminal("FOR"),
-                WHILE = new NonTerminal("WHILE"),
-                DOWHILE = new NonTerminal("DOWHILE"),
-                SWITCH = new NonTerminal("SWITCH"),
-                CUERPO_SWITCH = new NonTerminal("CUERPO_SWITCH"),
-                LIST_CASE = new NonTerminal("LIST_CASE"),
-                CASE = new NonTerminal("CASE"),
-                DEFECTO = new NonTerminal("DEFECTO"),
-                RETURN = new NonTerminal("RETURN"),
-                LLAMADA = new NonTerminal("LLAMADA"),
-                PRINT = new NonTerminal("PRINT"),
-                COMPARE = new NonTerminal("COMPARE"),
-                GETUSER = new NonTerminal("GETUSER"),
-                TIPO_DATO = new NonTerminal("TIPO_DATO");
+            //--------------------------------------RESERVADAS------------------------------------------------
+
+            #region Terminal
+            //TIPO DATO
+            var rint = ToTerm("Int");
+            var rdouble = ToTerm("Double");
+            var rstring = ToTerm("String");
+            var rchar = ToTerm("Char");
+            var rbool = ToTerm("Boolean");
+            var rvoid = ToTerm("Void");
+
+            //PALABRAS RESERVADAS
+            var importar = ToTerm("Import");
+            var retornar = ToTerm("Return");
+            var rprint = ToTerm("Print");
+            var rmain = ToTerm("Main");
+            var comparar = ToTerm("CompareTo");
+            var rGetUser = ToTerm("GetUser");
+            var rbreak = ToTerm("Break");
+
+
+            //OPERACIONES ARITMETICAS
+            var mas = ToTerm("+");
+            var menos = ToTerm("-");
+            var por = ToTerm("*");
+            var dividir = ToTerm("/");
+            var modulo = ToTerm("%");
+            var potencia = ToTerm("^");
+
+            //OPERACIONES RELACIONALES
+            var igual2 = ToTerm("==");
+            var diferente = ToTerm("!=");
+            var menor = ToTerm("<");
+            var mayor = ToTerm(">");
+            var menorigual = ToTerm("<=");
+            var mayorigual = ToTerm(">=");
+
+            //OPERACIONES LOGICAS
+            var rand = ToTerm("&&");
+            var ror = ToTerm("||");
+            var rxor = ToTerm("|&");
+            var rnot = ToTerm("!");
+
+            //OPERACIONES ESPECIALES
+            var incremento = ToTerm("++");
+            var decremento = ToTerm("--");
+            var masigual = ToTerm("+=");
+            var menosigual = ToTerm("-=");
+
+
+
+            //SENTENCIAS
+            var rif = ToTerm("If");
+            var relse = ToTerm("Else");
+            var relseif = ToTerm("Else if");
+            var rswitch = ToTerm("Switch");
+            var rcase = ToTerm("Case");
+            var defecto = ToTerm("Default");
+            var rfor = ToTerm("For");
+            var rdo = ToTerm("Do");
+            var rwhile = ToTerm("While");
+
+
+            //BOOLEANOS
+            var rtrue = ToTerm("true");
+            var rfalse = ToTerm("false");
+
+            //VARIOS            
+            var igual1 = ToTerm("=");
+            var dospuntos = ToTerm(":");
+            var coma = ToTerm(",");
+            var fin = ToTerm(";");
+            var apar = ToTerm("(");
+            var cpar = ToTerm(")");
+            var alla = ToTerm("{");
+            var clla = ToTerm("}");
+            var acor = ToTerm("[");
+            var ccor = ToTerm("]");
+
+
+
             #endregion
 
-            #region GRAMATICA
-            INICIO.Rule = LIST_IMPORT + LIST_CUERPO;
+            #region No terminales
+            NonTerminal INICIO = new NonTerminal("INICIO");
+            NonTerminal IMPORTE = new NonTerminal("IMPORTE");
+            NonTerminal IMPORTES = new NonTerminal("IMPORTES");
+            NonTerminal CUERPO = new NonTerminal("CUERPO");
+            NonTerminal CONTENIDOGENERAL = new NonTerminal("CONTENIDOGENERAL");
+            NonTerminal ASIGNA = new NonTerminal("ASIGNA");
+            NonTerminal DECLARA = new NonTerminal("DECLARA");
+            NonTerminal LISTA_IDS = new NonTerminal("LISTA_IDS");
+            NonTerminal TIPODATO = new NonTerminal("TIPODATO");
+            NonTerminal VALOR = new NonTerminal("VALOR");
+            NonTerminal EXPRESION = new NonTerminal("EXPRESION");
+            NonTerminal METODO = new NonTerminal("METODO");
+            NonTerminal LISTAPARAMETROS = new NonTerminal("LISTAPARAMETROS");
+            NonTerminal CUERPOMETODO = new NonTerminal("CUERPOMETODO");
+            NonTerminal LLAMADAMETODO = new NonTerminal("LLAMADAMETODO");
+            NonTerminal IMPRIMIR = new NonTerminal("IMPRIMIR");
+            NonTerminal PARAMETROSLLAMADOS = new NonTerminal("PARAMETROSLLAMADOS");
+            NonTerminal OPCIONAL = new NonTerminal("OPCIONAL");
+            NonTerminal SENTENCIARETURN = new NonTerminal("SENTENCIARETURN");
+            NonTerminal SENTENCIAWHILE = new NonTerminal("SENTENCIAWHILE");
+            NonTerminal SENTENCIADOWHILE = new NonTerminal("SENTENCIADOWHILE");
+            NonTerminal SENTENCIASWITCH = new NonTerminal("SENTENCIASWITCH");
+            NonTerminal CASO = new NonTerminal("CASO");
+            NonTerminal CASOS = new NonTerminal("CASOS");
+            NonTerminal DEFECTO = new NonTerminal("DEFECTO");
+            NonTerminal CONTENIDOSWITCH = new NonTerminal("CONTENIDOSWITCH");
+            NonTerminal LISTA_ARRAY = new NonTerminal(" LISTA_ARRAY");
 
-            LIST_IMPORT.Rule = LIST_IMPORT + IMPORT
-                             | IMPORT
-                             | Empty;
+            NonTerminal CONDICION = new NonTerminal("CONDICION");
+            NonTerminal CONDICIONPRIMA = new NonTerminal("CONDICIONPRIMA");
+            NonTerminal CONDICIONAL = new NonTerminal("CONDICIONAL");
+            NonTerminal LOGICOS = new NonTerminal("LOGICOS");
+            NonTerminal RELACIONAL = new NonTerminal("RELACIONAL");
+            NonTerminal SENTENCIAIF = new NonTerminal("SENTENCIAIF");
+            NonTerminal SENTENCIAIFAUX = new NonTerminal("SENTENCIAIFAUX");
+            NonTerminal SENTPRIMA = new NonTerminal("SENTPRIMA");
+            NonTerminal SENTENCIAELSEIF = new NonTerminal("SENTENCIAELSEIF");
+            NonTerminal SENTENCIA = new NonTerminal("SENTENCIA");
+            NonTerminal SENTENCIAS = new NonTerminal("SENTENCIAS");
+            NonTerminal SENTENCIAFOR = new NonTerminal("SENTENCIAFOR");
 
-			IMPORT.Rule = tkImport + cadena + tkPutoComa;
 
-            LIST_CUERPO.Rule = LIST_CUERPO + CUERPO
-                             | CUERPO;
 
-            CUERPO.Rule = DECLARACION
-                        | ASIGNACION
-                        | METODO;
-            
-            DECLARACION.Rule = LIST_ID + tkPts + TIPO_DATO + TIPO_DECLARACION;
 
-            TIPO_DECLARACION.Rule = VAR_LINEAL
-                                  | tkACor + E + tkCCor + VAR_VECTOR;
 
-            VAR_LINEAL.Rule = VALOR_LINEAL
-                            | Empty;
+            NonTerminal OPMATEMATICA = new NonTerminal("OPMATEMATICA");
+            NonTerminal C = new NonTerminal("C");
+            NonTerminal D = new NonTerminal("D");
 
-            VAR_VECTOR.Rule = VALOR_VECTOR
-                            | Empty;
 
-            VALOR_LINEAL.Rule = tkIgual + E;
 
-            VALOR_VECTOR.Rule = tkIgual + TIPO_VALOR;
 
-            TIPO_VALOR.Rule = tkALlav + LIST_E + tkCLlav
-                            | E;
 
-            ASIGNACION.Rule = id + TIPO_ASIGNACION;
 
-            TIPO_ASIGNACION.Rule = ASIGNAR_LINEAL | ASIGNAR_VECTOR;
 
-            ASIGNAR_LINEAL.Rule = VALOR_LINEAL;
 
-            ASIGNAR_VECTOR.Rule = ACCESO_VECTOR + VALOR_LINEAL;
 
-            ACCESO_VECTOR.Rule = id + tkACor + E + tkCCor;
 
-            LIST_E.Rule = LIST_E + tkComa + E
-                        | E;
 
-            LIST_ID.Rule = MakeListRule(LIST_ID, tkComa, id);
 
-            METODO.Rule = id + tkPts + TIPO_DATO + tkAPar + LIST_PARAMETRO + tkCPar + tkALlav + LIST_SENTENCIA + tkCLlav;
 
-            LIST_PARAMETRO.Rule = MakeListRule(LIST_PARAMETRO, tkComa, PARAMETRO);
 
-            PARAMETRO.Rule = id + tkPts + TIPO_DATO
-                           | Empty;
 
-            LIST_SENTENCIA.Rule = LIST_SENTENCIA + SENTENCIA
-                                | SENTENCIA;
 
-            SENTENCIA.Rule = DECLARACION + tkPutoComa
-                           | ASIGNACION + tkPutoComa
-                           | IF
-                           | FOR
-                           | WHILE
-                           | DOWHILE
-                           | SWITCH
-                           | RETURN
-                           | PRINT + tkPutoComa
-                           | COMPARE
-                           | GETUSER
-                           | Empty;
 
-            IF.Rule = tkIf + IF_AUX;
 
-            IF_AUX.Rule = tkAPar + C + tkCPar + tkALlav + LIST_SENTENCIA + tkCLlav + ELSE
-                        | SyntaxError + "}";
+            #endregion
 
-            ELSE.Rule = tkElse + SENTPRIMA
-                      | Empty
-                      | SyntaxError + "}";
+            #region Gramatica
+            INICIO.Rule = IMPORTES + CUERPO;
 
-            SENTPRIMA.Rule = tkIf + IF_AUX
-                           | tkALlav + LIST_SENTENCIA + tkCLlav;
+            IMPORTES.Rule = IMPORTES + IMPORTE
+                          | IMPORTE
+                          | Empty;
 
-            FOR.Rule = tkFor + tkAPar + DECLARACION + tkPutoComa + E + tkPutoComa + ASIGNACION_CORTO + tkCPar + tkALlav + LIST_SENTENCIA + tkCLlav;
 
-            WHILE.Rule = tkWhile + tkAPar + C + tkCPar + tkALlav + LIST_SENTENCIA + tkCLlav
-                       | SyntaxError + "}";
+            IMPORTE.Rule = importar + importaciones + fin;
 
-            DOWHILE.Rule = tkDo + tkALlav + LIST_SENTENCIA + tkCLlav + tkWhile + tkAPar + C + tkCPar + tkPutoComa
-                         | SyntaxError + "}";
 
-            SWITCH.Rule = tkSwitch + tkAPar + E + tkCPar + tkALlav + CUERPO_SWITCH + tkCLlav
-                        | SyntaxError + "}";
+            CUERPO.Rule = CUERPO + CONTENIDOGENERAL
+                          | CONTENIDOGENERAL;
 
-            CUERPO_SWITCH.Rule = LIST_CASE + DEFECTO;
+            CONTENIDOGENERAL.Rule = DECLARA
+                                   | ASIGNA
+                                   | METODO;
 
-            LIST_CASE.Rule = LIST_CASE + CASE
-                           | CASE;
+            DECLARA.Rule = id + dospuntos + TIPODATO + VALOR
+                            | LISTA_IDS + dospuntos + TIPODATO + VALOR
+                            | id + acor + OPMATEMATICA + ccor + igual1 + VALOR;
 
-            CASE.Rule = tkCase + E + tkPts + LIST_SENTENCIA;
+            ASIGNA.Rule = id + igual1 + OPMATEMATICA + fin
+                         | id + igual1 + alla + LISTA_ARRAY + clla + fin
+                         | id + acor + EXPRESION + ccor + igual1 + EXPRESION + fin
+                         | id + acor + EXPRESION + ccor + igual1 + id + acor + EXPRESION + ccor + fin;
 
-            DEFECTO.Rule = tkDefault + LIST_SENTENCIA
-                         | Empty;
 
-            RETURN.Rule = E + tkPutoComa
-                        | tkPutoComa;
+            VALOR.Rule = igual1 + OPMATEMATICA + fin
+                       | fin
+                       | acor + OPMATEMATICA + ccor + fin
+                       | acor + OPMATEMATICA + ccor + igual1 + alla + LISTA_ARRAY + clla + fin
+                       | acor + OPMATEMATICA + ccor + igual1 + OPMATEMATICA + fin;
 
-            PRINT.Rule = tkPrint + tkAPar + E + tkCPar;
 
-            COMPARE.Rule = id + tkPt + tkCompare + tkAPar + E + tkCPar;
+            LISTA_IDS.Rule = LISTA_IDS + coma + id
+                            | id;
 
-            GETUSER.Rule = tkGetUser + tkAPar + tkCPar;
+            LISTA_ARRAY.Rule = LISTA_ARRAY + coma + EXPRESION
+                            | EXPRESION;
 
-            ASIGNACION_CORTO.Rule = id + OP;
+            TIPODATO.Rule = rint
+                            | rdouble
+                            | rstring
+                            | rchar
+                            | rbool
+                            | rvoid
+                            | id;
 
-            OP.Rule = tkIncremento | tkDecremento;
 
-            C.Rule = C + L + C
-                   | E + R + E
-                   | tkNot + E
-                   | E;
 
-            R.Rule = tkEquiv
-                   | tkDif
-                   | tkMenor
-                   | tkMayor
-                   | tkMenorIgual
-                   | tkMayorIgual;
 
-            L.Rule = tkOr
-                   | tkAnd
-                   | tkXor
-                   | tkNot;
 
-            E.Rule = E + tkMas + E
-				   | E + tkMenos + E
-				   | E + tkPor + E
-				   | E + tkDiv + E
-				   | E + tkMod + E
-				   | E + tkPot + E
-				   | tkAPar + E + tkCPar
-				   | id
-				   | numero
-				   | cadena
-				   | caracter
-				   | tkTrue
-				   | tkFalse
-                   | INVOCAR;
 
-            INVOCAR.Rule = id + tkAPar + LIST_ATRIBUTO + tkCPar
-                         | ACCESO_VECTOR;
+            METODO.Rule = id + dospuntos + TIPODATO + apar + LISTAPARAMETROS + cpar + alla + SENTENCIAS + clla
+                        | rmain + dospuntos + TIPODATO + apar + LISTAPARAMETROS + cpar + alla + SENTENCIAS + clla;
 
-            LIST_ATRIBUTO.Rule = LIST_ATRIBUTO + tkComa + ATRIBUTO
-                               | ATRIBUTO
-                               | Empty;
 
-            ATRIBUTO.Rule = E;
 
-			TIPO_DATO.Rule = tkInt | tkDouble | tkString | tkChar | tkBoolean;
+            LISTAPARAMETROS.Rule = LISTAPARAMETROS + coma + id + dospuntos + TIPODATO
+                                 | id + dospuntos + TIPODATO
+                                 | Empty;
+
+
+            SENTENCIAS.Rule = SENTENCIAS + SENTENCIA
+                               | SENTENCIA;
+
+            SENTENCIA.Rule = ASIGNA
+                                | DECLARA
+                                | LLAMADAMETODO + fin
+                                | IMPRIMIR
+                                | SENTENCIAFOR
+                                | SENTENCIAIF
+                                | SENTENCIARETURN
+                                | SENTENCIAWHILE
+                                | SENTENCIADOWHILE
+                                | SENTENCIASWITCH
+                                | Empty;
+
+
+
+            //---------LLAMADA A METODO
+            LLAMADAMETODO.Rule = id + apar + PARAMETROSLLAMADOS + cpar
+                                | id + apar + cpar;
+
+
+            PARAMETROSLLAMADOS.Rule = PARAMETROSLLAMADOS + coma + OPMATEMATICA
+                                    | OPMATEMATICA;
+
+
+            //---------PRINT
+            IMPRIMIR.Rule = rprint + apar + EXPRESION + cpar;
+
+
+            //---------RETURN
+            SENTENCIARETURN.Rule = EXPRESION + fin
+                                  | fin;
+
+
+            //---------FOR
+            //falta contenido
+            SENTENCIAFOR.Rule = rfor + apar + id + dospuntos + TIPODATO + igual1 + EXPRESION + fin + LOGICOS + fin + id + EXPRESION + cpar + alla + SENTENCIAS + clla;
+
+
+            //---------IF
+            SENTENCIAIF.Rule = rif + SENTENCIAIFAUX;
+
+
+            SENTENCIAIFAUX.Rule = apar + CONDICION + cpar + alla + SENTENCIAS + clla + SENTENCIAELSEIF;
+            SENTENCIAIFAUX.ErrorRule = SyntaxError + "}";
+
+            SENTENCIAELSEIF.Rule = relse + SENTPRIMA
+                                  | Empty;
+            SENTENCIAELSEIF.ErrorRule = SyntaxError + "}";
+
+            SENTPRIMA.Rule = rif + SENTENCIAIFAUX
+                            | alla + SENTENCIAS + clla;
+
+            //---------WHILE
+            SENTENCIAWHILE.Rule = rwhile + apar + CONDICION + cpar + alla + SENTENCIAS + clla;
+            SENTENCIAWHILE.ErrorRule = SyntaxError + "}";
+
+
+            //---------DO WHILE
+            SENTENCIADOWHILE.Rule = rdo + alla + SENTENCIAS + clla + rwhile + apar + CONDICION + cpar + fin;
+            SENTENCIADOWHILE.ErrorRule = SyntaxError + ";";
+
+
+            ///--------SWITCH
+            SENTENCIASWITCH.Rule = rswitch + apar + EXPRESION + cpar + alla + SENTENCIAS + clla;
+            SENTENCIASWITCH.ErrorRule = SyntaxError + "}";
+
+
+            CONTENIDOSWITCH.Rule = CASOS + DEFECTO
+                                  | CASOS
+                                  | DEFECTO
+                                  | Empty;
+
+
+            CASOS.Rule = CASOS + CASO
+                       | CASO;
+
+
+            //---FALTA CONTENIDO
+            CASO.Rule = rcase + EXPRESION + dospuntos + SENTENCIAS + rbreak + fin;
+
+            //---FALTA CONTENIDO
+            DEFECTO.Rule = defecto + SENTENCIAS + dospuntos;
+
+
+            //CONDICION
+
+            CONDICION.Rule = LOGICOS + CONDICIONPRIMA;
+
+            CONDICIONPRIMA.Rule = CONDICIONPRIMA + CONDICIONAL
+                                | CONDICIONAL;
+
+            CONDICIONAL.Rule = rand + LOGICOS
+                                | ror + LOGICOS
+                                | Empty;
+
+
+            LOGICOS.Rule = EXPRESION + RELACIONAL + EXPRESION
+                           | EXPRESION;
+
+
+            RELACIONAL.Rule = igual2
+                               | menor
+                               | mayor
+                               | menorigual
+                               | mayorigual
+                               | diferente;
+
+
+            OPMATEMATICA.Rule = OPMATEMATICA + mas + C
+                             | OPMATEMATICA + menos + C
+                             | C;
+
+
+            C.Rule = C + por + EXPRESION
+                        | C + dividir + EXPRESION
+                        | C + modulo + EXPRESION
+                        | C + potencia + EXPRESION
+                        | EXPRESION;
+
+            EXPRESION.Rule = numentero
+                            | numdecimal
+                            | apar + OPMATEMATICA + cpar
+                            | alla + OPMATEMATICA + clla
+                            | cadena
+                            | caracter
+                            | rtrue
+                            | rfalse
+                            | LLAMADAMETODO
+                            | id;
+
+
+
+
+
             #endregion
 
             #region PREFERENCIAS
             Root = INICIO;
 
-            NonGrammarTerminals.Add(lineComment);
-            NonGrammarTerminals.Add(blockComment);
+            NonGrammarTerminals.Add(comentarioLinea);
+            NonGrammarTerminals.Add(comentarioBloque);
 
 			MarkPunctuation(";", "(", ")", "{", "}", ":", "=", "[", "]", ",");
 
-			RegisterOperators(1, Associativity.Left, tkMas, tkMenos);
-			RegisterOperators(2, Associativity.Left, tkPor, tkDiv, tkMod);
-			RegisterOperators(3, Associativity.Right, tkPot);
-			RegisterOperators(6, Associativity.Left, tkOr);
-			RegisterOperators(7, Associativity.Left, tkXor);
-			RegisterOperators(8, Associativity.Left, tkAnd);
-			RegisterOperators(9, Associativity.Left, tkNot);
-			#endregion
-		}
+            this.RegisterOperators(1, Associativity.Left, mas, menos);
+            this.RegisterOperators(2, Associativity.Left, por, dividir, modulo);
+            this.RegisterOperators(3, Associativity.Right, potencia);
+            this.RegisterOperators(5, igual2, diferente, menor, mayor, menorigual, mayorigual);
+            this.RegisterOperators(6, Associativity.Left, ror);
+            this.RegisterOperators(7, Associativity.Left, rxor);
+            this.RegisterOperators(8, Associativity.Left, rand);
+            this.RegisterOperators(9, Associativity.Left, diferente);
+            this.RegisterOperators(10, apar, cpar);
+            #endregion
+        }
 
 		public override void ReportParseError(ParsingContext context)
 		{

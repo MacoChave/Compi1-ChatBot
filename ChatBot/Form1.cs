@@ -16,6 +16,8 @@ namespace ChatBot
         {
             SingletonListas s = SingletonListas.getInstance();
             s.Variables.Clear();
+            s.Errores.Clear();
+            richTextBoxRestult.Clear();
             string texto = richTextBoxSource.Text;
             ParseTreeNode raiz = Analizador.Analizar(texto);
             if (raiz != null)
@@ -28,7 +30,7 @@ namespace ChatBot
                 richTextBoxRestult.Text += $"* {System.DateTime.Today}\n";
                 foreach (Variable v in s.Variables)
                 {
-                    richTextBoxRestult.Text += $"{v}\n";
+                    richTextBoxRestult.Text += $"* {v}\n";
                 }
                 richTextBoxRestult.Text += "*==================================================*\n";
             }
@@ -40,7 +42,7 @@ namespace ChatBot
                 richTextBoxRestult.Text += $"* {System.DateTime.Today}\n";
                 foreach (Error err in s.Errores)
                 {
-                    richTextBoxRestult.Text += $"{err}\n";
+                    richTextBoxRestult.Text += $"* {err}\n";
                 }
                 richTextBoxRestult.Text += "*==================================================*\n";
             }

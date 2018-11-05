@@ -117,8 +117,6 @@ namespace ChatBot.Compilador
                         };
                         list.Add(v);
                     }
-                    tipo = AnalisisSemantico(root.ChildNodes[1]).ToString().ToLower();
-                    valor = AnalisisSemantico(root.ChildNodes[2]);
                 }
                 else
                 {
@@ -126,22 +124,23 @@ namespace ChatBot.Compilador
                     list = new List<Variable>();
                     string id = root.ChildNodes[0].Token.ValueString;
                     int tam = (int)AnalisisSemantico(root.ChildNodes[2]);
-                    tipo = (string)AnalisisSemantico(root.ChildNodes[1]);
-                    valor = AnalisisSemantico(root.ChildNodes[2]);
 
                     for (int i = 0; i < tam; i++)
                         list.Add(new Variable(tipo, i, id, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column));
                 }
 
-                if (VerificarTipo(tipo, valor))
+                if (valor == null)
                 {
-                    foreach(Variable v in list)
-                    {
-                        v.Tipo = tipo;
-                        v.Valor = valor;
-                    }
+                    list.Clear();
+                    return list;
                 }
-                else
+
+                foreach(Variable v in list)
+                {
+                    v.Tipo = tipo;
+                    v.Valor = valor;
+                }
+                if (!VerificarTipo(tipo, valor))
                 {
                     SingletonListas s = SingletonListas.getInstance();
                     Error e = new Error()
@@ -410,7 +409,24 @@ namespace ChatBot.Compilador
             else
             {
                 //E;
-                result = ObtenerE(root.ChildNodes[0]);
+                try
+                {
+                    result = ObtenerE(root.ChildNodes[0]);
+                }
+                catch (Exception ex)
+                {
+                    result = null;
+                    SingletonListas s = SingletonListas.getInstance();
+                    Error e = new Error()
+                    {
+                        Columna = 0,
+                        Fila = 0,
+                        Fuente = ex.Source,
+                        Tipo = "Semántico",
+                        Comentario = ex.Message
+                    };
+                    s.Errores.Add(e);
+                }
             }
             return result;
         }
@@ -444,10 +460,10 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes[0].Token == null)
                     return ObtenerE(root.ChildNodes[0]);
                 //rtrue
-                if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("true") && root.ChildNodes[0].Term.Name.Equals("rtrue"))
+                if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("true"))
                     return true;
                 //rfalse
-                if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("false") && root.ChildNodes[0].Term.Name.Equals("rfalse"))
+                if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("false"))
                     return false;
                 if (root.ChildNodes[0].Term.Name.Equals("id"))
                 {
@@ -460,7 +476,7 @@ namespace ChatBot.Compilador
                     return int.Parse(root.ChildNodes[0].Token.ValueString);
                 //numdecimal
                 if (root.ChildNodes[0].Term.Name.ToLower().Equals("double"))
-                    return int.Parse(root.ChildNodes[0].Token.ValueString);
+                    return double.Parse(root.ChildNodes[0].Token.ValueString);
                 //cadena
                 if (root.ChildNodes[0].Term.Name.ToLower().Equals("string"))
                     return root.ChildNodes[0].Token.ValueString;
@@ -478,16 +494,30 @@ namespace ChatBot.Compilador
                 return valor1.ToString() + valor2.ToString();
             if (valor1 is int || valor2 is int)
             {
-                if (valor1 is double || valor2 is double)
-                    return (double)valor1 + (double)valor2;
+                if (valor1 is double)
+                    return (double)valor1 + (int)valor2;
+                if (valor2 is double)
+                    return (int)valor1 + (double)valor2;
+                if (valor1 is char)
+                    return (char)valor1 + (int)valor2;
+                if (valor2 is char)
+                    return (int)valor1 + (char)valor2;
+                if (valor1 is bool)
+                    return getValueBool((bool)valor1) + (int)valor2;
+                if (valor2 is bool)
+                    return (int)valor1 + getValueBool((bool)valor2);
                 return (int)valor1 + (int)valor2;
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return (int)valor1 + (double)valor2;
+                    return getValueBool((bool)valor1) + (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 + (int)valor2;
+                    return (double)valor1 + getValueBool((bool)valor2);
+                if (valor1 is char)
+                    return (char)valor1 + (double)valor2;
+                if (valor2 is char)
+                    return (double)valor1 + (char)valor2;
                 return (double)valor1 + (double)valor2;
             }
             if (valor1 is char || valor2 is char)
@@ -509,7 +539,7 @@ namespace ChatBot.Compilador
                 return (char)valor1 + (char)valor2;
             }
             if (valor1 is bool || valor2 is bool)
-                return (bool)valor1 || (bool)valor2;
+                return getValueBool((bool)valor1) + getValueBool((bool)valor2);
 
             return null;
         }
@@ -532,16 +562,30 @@ namespace ChatBot.Compilador
             }
             if (valor1 is int || valor2 is int)
             {
-                if (valor1 is double || valor2 is double)
-                    return (double)valor1 - (double)valor2;
+                if (valor1 is double)
+                    return (double)valor1 - (int)valor2;
+                if (valor2 is double)
+                    return (int)valor1 - (double)valor2;
+                if (valor1 is bool)
+                    return getValueBool((bool)valor1) - (int)valor2;
+                if (valor2 is bool)
+                    return (int)valor1 - getValueBool((bool)valor2);
+                if (valor1 is char)
+                    return (char)valor1 - (int)valor2;
+                if (valor2 is char)
+                    return (int)valor1 - (char)valor2;
                 return (int)valor1 - (int)valor2;
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return (int)valor1 - (double)valor2;
+                    return getValueBool((bool)valor1) - (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 - (int)valor2;
+                    return (double)valor1 - getValueBool((bool)valor2);
+                if (valor1 is char)
+                    return (char)valor1 - (double)valor2;
+                if (valor2 is char)
+                    return (double)valor1 - (char)valor2;
                 return (double)valor1 - (double)valor2;
             }
             if (valor1 is char || valor2 is char)
@@ -560,7 +604,8 @@ namespace ChatBot.Compilador
                     s.Errores.Add(e);
                     return null;
                 }
-                return (char)valor1 - (char)valor2;
+
+                return (int)((char)valor1 - (char)valor2);
             }
             if (valor1 is bool || valor2 is bool)
             {
@@ -597,16 +642,36 @@ namespace ChatBot.Compilador
             }
             if (valor1 is int || valor2 is int)
             {
-                if (valor1 is double || valor2 is double)
-                    return (double)valor1 * (double)valor2;
+                if (valor1 is double)
+                    return (double)valor1 * (int)valor2;
+                if (valor2 is double)
+                    return (int)valor1 * (double)valor2;
+
+                if (valor1 is bool)
+                    return getValueBool((bool)valor1) * (int)valor2;
+                if (valor2 is bool)
+                    return (int)valor1 * getValueBool((bool)valor2);
+
+
+                if (valor1 is char)
+                    return (char)valor1 * (int)valor2;
+                if (valor2 is char)
+                    return (int)valor1 * (char)valor2;
+
                 return (int)valor1 * (int)valor2;
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return (int)valor1 * (double)valor2;
+                    return getValueBool((bool)valor1) * (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 * (int)valor2;
+                    return (double)valor1 * getValueBool((bool)valor2);
+
+                if (valor1 is char)
+                    return (char)valor1 * (double)valor2;
+                if (valor2 is char)
+                    return (double)valor1 * (char)valor2;
+
                 return (double)valor1 * (double)valor2;
             }
             if (valor1 is char || valor2 is char)
@@ -625,11 +690,21 @@ namespace ChatBot.Compilador
                     s.Errores.Add(e);
                     return null;
                 }
-                return (char)valor1 * (char)valor2;
+                return (int)((char)valor1 * (char)valor2);
             }
             if (valor1 is bool || valor2 is bool)
-                return (bool)valor1 && (bool)valor2;
-
+            {
+                SingletonListas s = SingletonListas.getInstance();
+                Error e = new Error()
+                {
+                    Tipo = "Semántico",
+                    Columna = columna,
+                    Fila = fila,
+                    Fuente = "*",
+                    Comentario = "El operador * no opera bool"
+                };
+                s.Errores.Add(e);
+            }
             return null;
         }
 
@@ -651,16 +726,36 @@ namespace ChatBot.Compilador
             }
             if (valor1 is int || valor2 is int)
             {
-                if (valor1 is double || valor2 is double)
-                    return (double)valor1 / (double)valor2;
+                if (valor1 is double)
+                    return (double)valor1 / (int)valor2;
+                if (valor2 is double)
+                    return (int)valor1 / (double)valor2;
+
+                if (valor1 is bool)
+                    return (double)(getValueBool((bool)valor1) / (int)valor2);
+                if (valor2 is bool)
+                    return (double)((int)valor1 / getValueBool((bool)valor2));
+
+
+                if (valor1 is char)
+                    return (double)((char)valor1 / (int)valor2);
+                if (valor2 is char)
+                    return (double)((int)valor1 / (char)valor2);
+
                 return (double)((int)valor1 / (int)valor2);
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return (int)valor1 / (double)valor2;
+                    return getValueBool((bool)valor1) / (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 / (int)valor2;
+                    return (double)valor1 / getValueBool((bool)valor2);
+
+                if (valor1 is char)
+                    return (char)valor1 / (double)valor2;
+                if (valor2 is char)
+                    return (double)valor1 / (char)valor2;
+
                 return (double)valor1 / (double)valor2;
             }
             if (valor1 is char || valor2 is char)
@@ -679,7 +774,7 @@ namespace ChatBot.Compilador
                     s.Errores.Add(e);
                     return null;
                 }
-                return (char)valor1 / (char)valor2;
+                return (double)((char)valor1 / (char)valor2);
             }
             if (valor1 is bool || valor2 is bool)
             {
@@ -694,7 +789,6 @@ namespace ChatBot.Compilador
                 };
                 s.Errores.Add(e);
             }
-
             return null;
         }
 
@@ -716,16 +810,36 @@ namespace ChatBot.Compilador
             }
             if (valor1 is int || valor2 is int)
             {
-                if (valor1 is double || valor2 is double)
-                    return (double)valor1 % (double)valor2;
+                if (valor1 is double)
+                    return (double)valor1 % (int)valor2;
+                if (valor2 is double)
+                    return (int)valor1 % (double)valor2;
+
+                if (valor1 is bool)
+                    return (double)(getValueBool((bool)valor1) % (int)valor2);
+                if (valor2 is bool)
+                    return (double)((int)valor1 % getValueBool((bool)valor2));
+
+
+                if (valor1 is char)
+                    return (double)((char)valor1 % (int)valor2);
+                if (valor2 is char)
+                    return (double)((int)valor1 % (char)valor2);
+
                 return (double)((int)valor1 % (int)valor2);
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return (int)valor1 % (double)valor2;
+                    return getValueBool((bool)valor1) % (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 % (int)valor2;
+                    return (double)valor1 % getValueBool((bool)valor2);
+
+                if (valor1 is char)
+                    return (char)valor1 % (double)valor2;
+                if (valor2 is char)
+                    return (double)valor1 % (char)valor2;
+
                 return (double)valor1 % (double)valor2;
             }
             if (valor1 is char || valor2 is char)
@@ -744,7 +858,7 @@ namespace ChatBot.Compilador
                     s.Errores.Add(e);
                     return null;
                 }
-                return (char)valor1 % (char)valor2;
+                return (double)((char)valor1 % (char)valor2);
             }
             if (valor1 is bool || valor2 is bool)
             {
@@ -780,16 +894,39 @@ namespace ChatBot.Compilador
             }
             if (valor1 is int || valor2 is int)
             {
-                if (valor1 is double || valor2 is double)
-                    return Math.Pow((double)valor1,(double)valor2);
+                if (valor1 is double)
+                    return Math.Pow((double)valor1, (int)valor2);
+                if (valor2 is double)
+                    return Math.Pow((int)valor1, (double)valor2);
+
+                if (valor1 is char)
+                    return Math.Pow((char)valor1, (int)valor2);
+                if (valor2 is char)
+                    return Math.Pow((int)valor1, (char)valor2);
+
+                if (valor1 is bool)
+                    return Math.Pow(getValueBool((bool)valor1), (int)valor2);
+                if (valor2 is bool)
+                    return Math.Pow((int)valor1, getValueBool((bool)valor2));
+
                 return Math.Pow((int)valor1, (int)valor2);
+
+              
+
+              
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return Math.Pow((int)valor1, (double)valor2);
+                    return Math.Pow(getValueBool((bool)valor1), (double)valor2);
                 if (valor2 is bool)
-                    return Math.Pow((double)valor1, (int)valor2);
+                    return Math.Pow((double)valor1, getValueBool((bool)valor2));
+
+                if (valor1 is char)
+                    return Math.Pow((char)valor1, (double)valor2);
+                if (valor2 is char)
+                    return Math.Pow((double)valor1, (char)valor2);
+
                 return Math.Pow((double)valor1, (double)valor2);
             }
             if (valor1 is char || valor2 is char)
@@ -808,7 +945,7 @@ namespace ChatBot.Compilador
                     s.Errores.Add(e);
                     return null;
                 }
-                return Math.Pow((int)valor1, (int)valor2);
+                return Math.Pow((char)valor1, (char)valor2);
             }
             if (valor1 is bool || valor2 is bool)
             {
@@ -943,16 +1080,34 @@ namespace ChatBot.Compilador
             switch (tipo)
             {
                 case "int":
+                    if (!(valor is string))
+                    {
+                        if (valor is int)
+                            return true;
+
+                    }  return false;
                 case "double":
-                    return !(valor is string);
+                    if (!(valor is string))
+                    {
+
+                        if (valor is double)
+                            return true;
+                    }
+                    return false; 
                 case "string":
                     return valor is string;
                 case "char":
                     return (valor is char) || (valor is int);
-                case "bool":
+                case "boolean":
                     return (valor is bool) || (valor is int);
             }
             return false;
         }
+
+        private static int getValueBool(bool valor)
+        {
+            return (valor) ? 1 : 0;
+        }
+
     }
 }

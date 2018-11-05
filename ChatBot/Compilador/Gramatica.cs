@@ -5,7 +5,7 @@ namespace ChatBot.Compilador
 {
 	class Gramatica : Grammar
 	{
-		public Gramatica() : base(caseSensitive: true)
+		public Gramatica() : base(caseSensitive: false)
 		{
             #region ER
 

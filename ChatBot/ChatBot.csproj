@@ -55,6 +55,9 @@
     <Compile Include="Archivos\ControlDOT.cs" />
     <Compile Include="Compilador\Analizador.cs" />
     <Compile Include="Compilador\Gramatica.cs" />
+    <Compile Include="Compilador\SingletonListas.cs" />
+    <Compile Include="Objeto\Error.cs" />
+    <Compile Include="Objeto\Variable.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

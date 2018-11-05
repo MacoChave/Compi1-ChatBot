@@ -8,6 +8,7 @@ namespace ChatBot.Compilador
 		public Gramatica() : base(caseSensitive: true)
 		{
             #region ER
+
             /*NUMERO ENTERO*/
             RegexBasedTerminal numentero = new RegexBasedTerminal("Int", "[0-9]+");
 
@@ -28,11 +29,13 @@ namespace ChatBot.Compilador
 
             CommentTerminal comentarioLinea = new CommentTerminal("comentarioLinea", "//", "\n", "\r\n");
             CommentTerminal comentarioBloque = new CommentTerminal("comentarioBloque", "/*", "*/");
+
             #endregion
 
             //--------------------------------------RESERVADAS------------------------------------------------
 
             #region Terminal
+
             //TIPO DATO
             var rint = ToTerm("Int");
             var rdouble = ToTerm("Double");
@@ -49,8 +52,7 @@ namespace ChatBot.Compilador
             var comparar = ToTerm("CompareTo");
             var rGetUser = ToTerm("GetUser");
             var rbreak = ToTerm("Break");
-
-
+            
             //OPERACIONES ARITMETICAS
             var mas = ToTerm("+");
             var menos = ToTerm("-");
@@ -78,9 +80,7 @@ namespace ChatBot.Compilador
             var decremento = ToTerm("--");
             var masigual = ToTerm("+=");
             var menosigual = ToTerm("-=");
-
-
-
+            
             //SENTENCIAS
             var rif = ToTerm("If");
             var relse = ToTerm("Else");
@@ -91,8 +91,7 @@ namespace ChatBot.Compilador
             var rfor = ToTerm("For");
             var rdo = ToTerm("Do");
             var rwhile = ToTerm("While");
-
-
+            
             //BOOLEANOS
             var rtrue = ToTerm("true");
             var rfalse = ToTerm("false");
@@ -108,12 +107,11 @@ namespace ChatBot.Compilador
             var clla = ToTerm("}");
             var acor = ToTerm("[");
             var ccor = ToTerm("]");
-
-
-
+            
             #endregion
 
             #region No terminales
+
             NonTerminal INICIO = new NonTerminal("INICIO");
             NonTerminal IMPORTE = new NonTerminal("IMPORTE");
             NonTerminal IMPORTES = new NonTerminal("IMPORTES");
@@ -154,143 +152,109 @@ namespace ChatBot.Compilador
             NonTerminal SENTENCIA = new NonTerminal("SENTENCIA");
             NonTerminal SENTENCIAS = new NonTerminal("SENTENCIAS");
             NonTerminal SENTENCIAFOR = new NonTerminal("SENTENCIAFOR");
-
-
-
-
-
-            NonTerminal OPMATEMATICA = new NonTerminal("OPMATEMATICA");
+            NonTerminal ASIGNACION_CORTO = new NonTerminal("ASIGNACION_CORTO");
             NonTerminal C = new NonTerminal("C");
             NonTerminal D = new NonTerminal("D");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            
+            NonTerminal OPMATEMATICA = new NonTerminal("OPMATEMATICA");
+            NonTerminal OP = new NonTerminal("OP");
+            NonTerminal E = new NonTerminal("E");
+            NonTerminal L = new NonTerminal("L");
+            NonTerminal R = new NonTerminal("R");
+            NonTerminal INVOCAR = new NonTerminal("INVOCAR");
+            NonTerminal LIST_ATRIBUTO = new NonTerminal("LIST_ATRIBUTO");
+            NonTerminal ACCESO_VECTOR = new NonTerminal("ACCESO_VECTOR");
+            NonTerminal ATRIBUTO = new NonTerminal("ATRIBUTO");
 
             #endregion
 
             #region Gramatica
+
             INICIO.Rule = IMPORTES + CUERPO;
 
             IMPORTES.Rule = IMPORTES + IMPORTE
                           | IMPORTE
                           | Empty;
-
-
+            
             IMPORTE.Rule = importar + importaciones + fin;
-
-
+            
             CUERPO.Rule = CUERPO + CONTENIDOGENERAL
-                          | CONTENIDOGENERAL;
+                        | CONTENIDOGENERAL;
 
             CONTENIDOGENERAL.Rule = DECLARA
                                    | ASIGNA
                                    | METODO;
 
-            DECLARA.Rule = id + dospuntos + TIPODATO + VALOR
-                            | LISTA_IDS + dospuntos + TIPODATO + VALOR
-                            | id + acor + OPMATEMATICA + ccor + igual1 + VALOR;
+            DECLARA.Rule = id + dospuntos + TIPODATO + igual1 + VALOR
+                         | LISTA_IDS + dospuntos + TIPODATO+ igual1 + VALOR
+                         | id + dospuntos + TIPODATO + acor + E + ccor + igual1 + VALOR;
 
-            ASIGNA.Rule = id + igual1 + OPMATEMATICA + fin
-                         | id + igual1 + alla + LISTA_ARRAY + clla + fin
-                         | id + acor + EXPRESION + ccor + igual1 + EXPRESION + fin
-                         | id + acor + EXPRESION + ccor + igual1 + id + acor + EXPRESION + ccor + fin;
+            ASIGNA.Rule = id + igual1 + C + fin
+                        | id + igual1 + alla + LISTA_ARRAY + clla + fin
+                        | id + acor + E + ccor + igual1 + C + fin
+                        | id + acor + E + ccor + igual1 + id + acor + E + ccor + fin;
 
-
-            VALOR.Rule = igual1 + OPMATEMATICA + fin
+            VALOR.Rule = C + fin
                        | fin
-                       | acor + OPMATEMATICA + ccor + fin
-                       | acor + OPMATEMATICA + ccor + igual1 + alla + LISTA_ARRAY + clla + fin
-                       | acor + OPMATEMATICA + ccor + igual1 + OPMATEMATICA + fin;
-
-
+                       | alla + LISTA_ARRAY + clla + fin;
+            
             LISTA_IDS.Rule = LISTA_IDS + coma + id
                             | id;
 
-            LISTA_ARRAY.Rule = LISTA_ARRAY + coma + EXPRESION
-                            | EXPRESION;
+            LISTA_ARRAY.Rule = LISTA_ARRAY + coma + C
+                            | C;
 
             TIPODATO.Rule = rint
-                            | rdouble
-                            | rstring
-                            | rchar
-                            | rbool
-                            | rvoid
-                            | id;
-
-
-
-
-
-
+                          | rdouble
+                          | rstring
+                          | rchar
+                          | rbool
+                          | rvoid;
+            
             METODO.Rule = id + dospuntos + TIPODATO + apar + LISTAPARAMETROS + cpar + alla + SENTENCIAS + clla
                         | rmain + dospuntos + TIPODATO + apar + LISTAPARAMETROS + cpar + alla + SENTENCIAS + clla;
-
-
-
+            
             LISTAPARAMETROS.Rule = LISTAPARAMETROS + coma + id + dospuntos + TIPODATO
                                  | id + dospuntos + TIPODATO
                                  | Empty;
-
-
+            
             SENTENCIAS.Rule = SENTENCIAS + SENTENCIA
-                               | SENTENCIA;
+                            | SENTENCIA;
 
             SENTENCIA.Rule = ASIGNA
-                                | DECLARA
-                                | LLAMADAMETODO + fin
-                                | IMPRIMIR
-                                | SENTENCIAFOR
-                                | SENTENCIAIF
-                                | SENTENCIARETURN
-                                | SENTENCIAWHILE
-                                | SENTENCIADOWHILE
-                                | SENTENCIASWITCH
-                                | Empty;
-
-
-
+                            | DECLARA
+                            | LLAMADAMETODO + fin
+                            | IMPRIMIR
+                            | SENTENCIAFOR
+                            | SENTENCIAIF
+                            | SENTENCIARETURN
+                            | SENTENCIAWHILE
+                            | SENTENCIADOWHILE
+                            | SENTENCIASWITCH
+                            | Empty;
+            
             //---------LLAMADA A METODO
             LLAMADAMETODO.Rule = id + apar + PARAMETROSLLAMADOS + cpar
                                 | id + apar + cpar;
-
-
-            PARAMETROSLLAMADOS.Rule = PARAMETROSLLAMADOS + coma + OPMATEMATICA
-                                    | OPMATEMATICA;
-
-
+            
+            PARAMETROSLLAMADOS.Rule = PARAMETROSLLAMADOS + coma + C
+                                    | C;
+            
             //---------PRINT
-            IMPRIMIR.Rule = rprint + apar + EXPRESION + cpar;
-
-
+            IMPRIMIR.Rule = rprint + apar + C + cpar;
+            
             //---------RETURN
-            SENTENCIARETURN.Rule = EXPRESION + fin
+            SENTENCIARETURN.Rule = C + fin
                                   | fin;
-
-
+            
             //---------FOR
             //falta contenido
-            SENTENCIAFOR.Rule = rfor + apar + id + dospuntos + TIPODATO + igual1 + EXPRESION + fin + LOGICOS + fin + id + EXPRESION + cpar + alla + SENTENCIAS + clla;
-
-
+            SENTENCIAFOR.Rule = rfor + apar + id + dospuntos + TIPODATO + igual1 + E + fin + C + fin + OP + cpar + alla + SENTENCIAS + clla;
+            
             //---------IF
             SENTENCIAIF.Rule = rif + SENTENCIAIFAUX;
-
-
-            SENTENCIAIFAUX.Rule = apar + CONDICION + cpar + alla + SENTENCIAS + clla + SENTENCIAELSEIF;
+            
+            SENTENCIAIFAUX.Rule = apar + C + cpar + alla + SENTENCIAS + clla + SENTENCIAELSEIF;
             SENTENCIAIFAUX.ErrorRule = SyntaxError + "}";
 
             SENTENCIAELSEIF.Rule = relse + SENTPRIMA
@@ -301,86 +265,76 @@ namespace ChatBot.Compilador
                             | alla + SENTENCIAS + clla;
 
             //---------WHILE
-            SENTENCIAWHILE.Rule = rwhile + apar + CONDICION + cpar + alla + SENTENCIAS + clla;
+            SENTENCIAWHILE.Rule = rwhile + apar + C + cpar + alla + SENTENCIAS + clla;
             SENTENCIAWHILE.ErrorRule = SyntaxError + "}";
 
-
             //---------DO WHILE
-            SENTENCIADOWHILE.Rule = rdo + alla + SENTENCIAS + clla + rwhile + apar + CONDICION + cpar + fin;
+            SENTENCIADOWHILE.Rule = rdo + alla + SENTENCIAS + clla + rwhile + apar + C + cpar + fin;
             SENTENCIADOWHILE.ErrorRule = SyntaxError + ";";
-
-
+            
             ///--------SWITCH
-            SENTENCIASWITCH.Rule = rswitch + apar + EXPRESION + cpar + alla + SENTENCIAS + clla;
+            SENTENCIASWITCH.Rule = rswitch + apar + E + cpar + alla + SENTENCIAS + clla;
             SENTENCIASWITCH.ErrorRule = SyntaxError + "}";
-
-
+            
             CONTENIDOSWITCH.Rule = CASOS + DEFECTO
                                   | CASOS
                                   | DEFECTO
                                   | Empty;
-
-
+            
             CASOS.Rule = CASOS + CASO
                        | CASO;
-
-
+            
             //---FALTA CONTENIDO
-            CASO.Rule = rcase + EXPRESION + dospuntos + SENTENCIAS + rbreak + fin;
+            CASO.Rule = rcase + C + dospuntos + SENTENCIAS + rbreak + fin;
 
             //---FALTA CONTENIDO
             DEFECTO.Rule = defecto + SENTENCIAS + dospuntos;
-
-
+            
             //CONDICION
+            ASIGNACION_CORTO.Rule = id + OP;
 
-            CONDICION.Rule = LOGICOS + CONDICIONPRIMA;
+            OP.Rule = incremento | decremento;
 
-            CONDICIONPRIMA.Rule = CONDICIONPRIMA + CONDICIONAL
-                                | CONDICIONAL;
+            C.Rule = C + L + C
+                   | E + R + E
+                   | menos + E
+                   | E;
 
-            CONDICIONAL.Rule = rand + LOGICOS
-                                | ror + LOGICOS
-                                | Empty;
+            R.Rule = igual2
+                   | diferente
+                   | menor
+                   | mayor
+                   | menorigual
+                   | mayorigual;
 
+            L.Rule = ror
+                   | rand
+                   | rxor
+                   | rnot;
 
-            LOGICOS.Rule = EXPRESION + RELACIONAL + EXPRESION
-                           | EXPRESION;
+            E.Rule = E + mas + E
+                   | E + menos + E
+                   | E + por + E
+                   | E + dividir + E
+                   | E + modulo + E
+                   | E + potencia + E
+                   | apar + E + cpar
+                   | id
+                   | numentero
+                   | numdecimal
+                   | cadena
+                   | caracter
+                   | rtrue
+                   | rfalse;
 
+            INVOCAR.Rule = id + apar + LIST_ATRIBUTO + cpar
+                         | ACCESO_VECTOR;
 
-            RELACIONAL.Rule = igual2
-                               | menor
-                               | mayor
-                               | menorigual
-                               | mayorigual
-                               | diferente;
+            LIST_ATRIBUTO.Rule = LIST_ATRIBUTO + coma + ATRIBUTO
+                               | ATRIBUTO
+                               | Empty;
 
-
-            OPMATEMATICA.Rule = OPMATEMATICA + mas + C
-                             | OPMATEMATICA + menos + C
-                             | C;
-
-
-            C.Rule = C + por + EXPRESION
-                        | C + dividir + EXPRESION
-                        | C + modulo + EXPRESION
-                        | C + potencia + EXPRESION
-                        | EXPRESION;
-
-            EXPRESION.Rule = numentero
-                            | numdecimal
-                            | apar + OPMATEMATICA + cpar
-                            | alla + OPMATEMATICA + clla
-                            | cadena
-                            | caracter
-                            | rtrue
-                            | rfalse
-                            | LLAMADAMETODO
-                            | id;
-
-
-
-
+            ATRIBUTO.Rule = E;
 
             #endregion
 

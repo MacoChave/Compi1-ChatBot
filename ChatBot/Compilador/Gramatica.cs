@@ -185,16 +185,16 @@ namespace ChatBot.Compilador
                                    | ASIGNA
                                    | METODO;
 
-            DECLARA.Rule = id + dospuntos + TIPODATO + igual1 + VALOR
-                         | LISTA_IDS + dospuntos + TIPODATO+ igual1 + VALOR
-                         | id + dospuntos + TIPODATO + acor + E + ccor + igual1 + VALOR;
+            DECLARA.Rule = id + dospuntos + TIPODATO + VALOR
+                         | LISTA_IDS + dospuntos + TIPODATO+ VALOR
+                         | id + dospuntos + TIPODATO + acor + E + ccor + VALOR;
 
             ASIGNA.Rule = id + igual1 + C + fin
                         | id + igual1 + alla + LISTA_ARRAY + clla + fin
                         | id + acor + E + ccor + igual1 + C + fin
                         | id + acor + E + ccor + igual1 + id + acor + E + ccor + fin;
 
-            VALOR.Rule = C + fin
+            VALOR.Rule = igual1 + C + fin
                        | fin
                        | alla + LISTA_ARRAY + clla + fin;
             

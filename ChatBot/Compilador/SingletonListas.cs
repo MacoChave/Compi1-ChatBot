@@ -13,7 +13,7 @@ namespace ChatBot.Compilador
             Errores = new List<Error>();
         }
 
-        public static SingletonListas getInstance()
+        public static SingletonListas GetInstance()
         {
             if (instancia == null)
                 instancia = new SingletonListas();

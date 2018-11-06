@@ -14,7 +14,7 @@ namespace ChatBot
 
         private void buttonAnalizar_Click(object sender, System.EventArgs e)
         {
-            SingletonListas s = SingletonListas.getInstance();
+            SingletonListas s = SingletonListas.GetInstance();
             s.Variables.Clear();
             s.Errores.Clear();
             richTextBoxRestult.Clear();

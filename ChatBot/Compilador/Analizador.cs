@@ -80,7 +80,7 @@ namespace ChatBot.Compilador
                     foreach (Variable v in lista)
                         v.Ambito = "GENERAL";
 
-                    SingletonListas sl = SingletonListas.getInstance();
+                    SingletonListas sl = SingletonListas.GetInstance();
                     sl.Variables.AddRange(lista);
                 }
                 if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
@@ -98,11 +98,11 @@ namespace ChatBot.Compilador
             {
                 List<Variable> list;
                 string tipo = (string)AnalisisSemantico(root.ChildNodes[1]);
-                object valor = AnalisisSemantico(root.ChildNodes[2]);
 
                 if (root.ChildNodes.Count == 3)
                 {
                     //LISTA_IDS + TIPODATO + VALOR
+                    object valor;
                     if (root.ChildNodes[0].Token == null)
                         list = (List< Variable >)AnalisisSemantico(root.ChildNodes[0]);
                     else
@@ -117,43 +117,88 @@ namespace ChatBot.Compilador
                         };
                         list.Add(v);
                     }
+
+                    valor = AnalisisSemantico(root.ChildNodes[2]);
+                    if (valor == null)
+                {
+                    list.Clear();
+                    return list;
+                }
+                    foreach(Variable v in list)
+                    {
+                        v.Tipo = tipo;
+                        v.Valor = valor;
+                    }
+                    if (!VerificarTipo(tipo, valor))
+                    {
+                        SingletonListas s = SingletonListas.GetInstance();
+                        Error e = new Error()
+                        {
+                            Tipo = "Semántico",
+                            Fuente = list[list.Count - 1].Id,
+                            Columna = list[list.Count - 1].Columna,
+                            Fila = list[list.Count - 1].Fila,
+                            Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {valor.GetType()}"
+                        };
+                        s.Errores.Add(e);
+                        list.Clear();
+                    }
                 }
                 else
                 {
                     //id + TIPODATO + E + VALOR;
+                    List<object> valor;
                     list = new List<Variable>();
                     string id = root.ChildNodes[0].Token.ValueString;
                     int tam = (int)AnalisisSemantico(root.ChildNodes[2]);
 
                     for (int i = 0; i < tam; i++)
                         list.Add(new Variable(tipo, i, id, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column));
-                }
 
-                if (valor == null)
-                {
-                    list.Clear();
-                    return list;
-                }
-
-                foreach(Variable v in list)
-                {
-                    v.Tipo = tipo;
-                    v.Valor = valor;
-                }
-                if (!VerificarTipo(tipo, valor))
-                {
-                    SingletonListas s = SingletonListas.getInstance();
-                    Error e = new Error()
+                    valor = (List< object >)AnalisisSemantico(root.ChildNodes[3]);
+                    if (valor.Count == 0) return list;
+                    if (list.Count != valor.Count)
                     {
-                        Tipo = "Semántico",
-                        Fuente = list[list.Count - 1].Id,
-                        Columna = list[list.Count - 1].Columna,
-                        Fila = list[list.Count - 1].Fila,
-                        Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {valor.GetType()}"
-                    };
-                    s.Errores.Add(e);
-                    list.Clear();
+                        SingletonListas s = SingletonListas.GetInstance();
+                        Error e = new Error()
+                        {
+                            Tipo = "Semántico",
+                            Fuente = list[list.Count - 1].Id,
+                            Columna = list[list.Count - 1].Columna,
+                            Fila = list[list.Count - 1].Fila,
+                            Comentario = $"Dimension incorrecta"
+                        };
+                        s.Errores.Add(e);
+                        list.Clear();
+                        return list;
+                    }
+                    foreach (object o in valor)
+                    {
+                        if (!VerificarTipo(tipo, o))
+                        {
+                            SingletonListas s = SingletonListas.GetInstance();
+                            Error e = new Error()
+                            {
+                                Tipo = "Semántico",
+                                Fuente = list[list.Count - 1].Id,
+                                Columna = list[list.Count - 1].Columna,
+                                Fila = list[list.Count - 1].Fila,
+                                Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {o.GetType()}"
+                            };
+                            s.Errores.Add(e);
+                            list.Clear();
+                            return list;
+                        }
+
+                    }
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        list[i].Valor = valor[i];
+                        list[i].Tipo = tipo;
+                    }
                 }
+
+                
                 result = list;
             }
             else if (root.Term.Name.Equals("ASIGNA"))
@@ -368,7 +413,7 @@ namespace ChatBot.Compilador
             if (result is double)
                 return (double)result * -1;
 
-            SingletonListas s = SingletonListas.getInstance();
+            SingletonListas s = SingletonListas.GetInstance();
             Error e = new Error()
             {
                 Tipo = "Semántico",
@@ -416,7 +461,7 @@ namespace ChatBot.Compilador
                 catch (Exception ex)
                 {
                     result = null;
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Columna = 0,
@@ -468,7 +513,7 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes[0].Term.Name.Equals("id"))
                 {
                     //id
-                    SingletonListas temp = SingletonListas.getInstance();
+                    SingletonListas temp = SingletonListas.GetInstance();
                     return temp.getValue(root.ChildNodes[0].Token.ValueString);
                 }
                 //numentero
@@ -524,7 +569,7 @@ namespace ChatBot.Compilador
             {
                 if (valor1 is bool || valor2 is bool)
                 {
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Tipo = "Semántico",
@@ -548,7 +593,7 @@ namespace ChatBot.Compilador
         {
             if (valor1 is string || valor2 is string)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -592,7 +637,7 @@ namespace ChatBot.Compilador
             {
                 if (valor1 is bool || valor2 is bool)
                 {
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Tipo = "Semántico",
@@ -609,7 +654,7 @@ namespace ChatBot.Compilador
             }
             if (valor1 is bool || valor2 is bool)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -628,7 +673,7 @@ namespace ChatBot.Compilador
         {
             if (valor1 is string || valor2 is string)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -678,7 +723,7 @@ namespace ChatBot.Compilador
             {
                 if (valor1 is bool || valor2 is bool)
                 {
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Tipo = "Semántico",
@@ -694,7 +739,7 @@ namespace ChatBot.Compilador
             }
             if (valor1 is bool || valor2 is bool)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -712,7 +757,7 @@ namespace ChatBot.Compilador
         {
             if (valor1 is string || valor2 is string)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -762,7 +807,7 @@ namespace ChatBot.Compilador
             {
                 if (valor1 is bool || valor2 is bool)
                 {
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Tipo = "Semántico",
@@ -778,7 +823,7 @@ namespace ChatBot.Compilador
             }
             if (valor1 is bool || valor2 is bool)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -796,7 +841,7 @@ namespace ChatBot.Compilador
         {
             if (valor1 is string || valor2 is string)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -846,7 +891,7 @@ namespace ChatBot.Compilador
             {
                 if (valor1 is bool || valor2 is bool)
                 {
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Tipo = "Semántico",
@@ -862,7 +907,7 @@ namespace ChatBot.Compilador
             }
             if (valor1 is bool || valor2 is bool)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -880,7 +925,7 @@ namespace ChatBot.Compilador
         {
             if (valor1 is string || valor2 is string)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -933,7 +978,7 @@ namespace ChatBot.Compilador
             {
                 if (valor1 is bool || valor2 is bool)
                 {
-                    SingletonListas s = SingletonListas.getInstance();
+                    SingletonListas s = SingletonListas.GetInstance();
                     Error e = new Error()
                     {
                         Tipo = "Semántico",
@@ -949,7 +994,7 @@ namespace ChatBot.Compilador
             }
             if (valor1 is bool || valor2 is bool)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -967,7 +1012,7 @@ namespace ChatBot.Compilador
         {
             if (!(valor1 is bool) && !(valor2 is bool))
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",
@@ -1060,7 +1105,7 @@ namespace ChatBot.Compilador
             }
             if (valor1 is string || valor2 is string)
             {
-                SingletonListas s = SingletonListas.getInstance();
+                SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
                 {
                     Tipo = "Semántico",

@@ -32,13 +32,14 @@ namespace ChatBot.Compilador
             string grafoDOT = Archivos.ControlDOT.GetDot(raiz);
             WINGRAPHVIZLib.DOT dot = new WINGRAPHVIZLib.DOT();
             WINGRAPHVIZLib.BinaryImage img = dot.ToPNG(grafoDOT);
+            img.Save(nombre);
         }
 
         /****************************************************************************
          ***********************     ANALIZADOR SEMÁNTICO     ***********************
          * Comprobar tipos de datos de variables y procedimientos
          ****************************************************************************/
-        public static object AnalisisSemantico (ParseTreeNode root, object h1 = null)
+        public static object AnalisisSemantico (ParseTreeNode root, string H_AMBITO = "GLOBLAL")
         {
             object result = null;
 
@@ -76,12 +77,27 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes[0].Term.Name.Equals("DECLARA"))
                 {
                     //DECLARA
+                    SingletonListas s = SingletonListas.GetInstance();
                     List<Variable> lista = (List < Variable > )AnalisisSemantico(root.ChildNodes[0]);
                     foreach (Variable v in lista)
+                    {
                         v.Ambito = "GENERAL";
+                        if (s.GetVarValue(v.Id) != null)
+                        {
+                            Error e = new Error()
+                            {
+                                Tipo = "Semántico",
+                                Fuente = v.Id,
+                                Columna = v.Columna,
+                                Fila = v.Fila,
+                                Comentario = $"{v.Id} ya se encuentra declarada"
+                            };
+                            s.Errores.Add(e);
+                            lista.Remove(v);
+                        }
+                    }
 
-                    SingletonListas sl = SingletonListas.GetInstance();
-                    sl.Variables.AddRange(lista);
+                    s.AddVariableGlobal(lista);
                 }
                 if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
                 {
@@ -91,7 +107,7 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes[0].Term.Name.Equals("METODO"))
                 {
                     //METODO
-                    AnalisisSemantico(root.ChildNodes[0]);
+                    Ambito ambito = (Ambito)AnalisisSemantico(root.ChildNodes[0]);
                 }
             }
             else if (root.Term.Name.Equals("DECLARA"))
@@ -113,35 +129,40 @@ namespace ChatBot.Compilador
                         {
                             Id = root.ChildNodes[0].Token.ValueString,
                             Fila = root.ChildNodes[0].Token.Location.Line,
-                            Columna = root.ChildNodes[0].Token.Location.Column
+                            Columna = root.ChildNodes[0].Token.Location.Column,
+                            Tipo = tipo,
+                            Valor = DefaultValue(tipo)
                         };
                         list.Add(v);
                     }
-
-                    valor = AnalisisSemantico(root.ChildNodes[2]);
-                    if (valor == null)
-                {
-                    list.Clear();
-                    return list;
-                }
-                    foreach(Variable v in list)
+                    
+                    if (root.ChildNodes[2].ChildNodes.Count > 0)
                     {
-                        v.Tipo = tipo;
-                        v.Valor = valor;
-                    }
-                    if (!VerificarTipo(tipo, valor))
-                    {
-                        SingletonListas s = SingletonListas.GetInstance();
-                        Error e = new Error()
+                        valor = AnalisisSemantico(root.ChildNodes[2]);
+                        if (valor == null)
                         {
-                            Tipo = "Semántico",
-                            Fuente = list[list.Count - 1].Id,
-                            Columna = list[list.Count - 1].Columna,
-                            Fila = list[list.Count - 1].Fila,
-                            Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {valor.GetType()}"
-                        };
-                        s.Errores.Add(e);
-                        list.Clear();
+                            list.Clear();
+                            return list;
+                        }
+                        foreach(Variable v in list)
+                        {
+                            v.Tipo = tipo;
+                            v.Valor = valor;
+                        }
+                        if (!VerificarTipo(tipo, valor))
+                        {
+                            SingletonListas s = SingletonListas.GetInstance();
+                            Error e = new Error()
+                            {
+                                Tipo = "Semántico",
+                                Fuente = list[list.Count - 1].Id,
+                                Columna = list[list.Count - 1].Columna,
+                                Fila = list[list.Count - 1].Fila,
+                                Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {valor.GetType()}"
+                            };
+                            s.Errores.Add(e);
+                            list.Clear();
+                        }
                     }
                 }
                 else
@@ -153,7 +174,18 @@ namespace ChatBot.Compilador
                     int tam = (int)AnalisisSemantico(root.ChildNodes[2]);
 
                     for (int i = 0; i < tam; i++)
-                        list.Add(new Variable(tipo, i, id, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column));
+                    {
+                        Variable v = new Variable()
+                        {
+                            Indice = i,
+                            Id = id,
+                            Tipo = tipo,
+                            Valor = DefaultValue(tipo),
+                            Fila = root.ChildNodes[0].Token.Location.Line,
+                            Columna = root.ChildNodes[0].Token.Location.Column,
+                        };
+                        list.Add(v);
+                    }
 
                     valor = (List< object >)AnalisisSemantico(root.ChildNodes[3]);
                     if (valor.Count == 0) return list;
@@ -198,7 +230,6 @@ namespace ChatBot.Compilador
                     }
                 }
 
-                
                 result = list;
             }
             else if (root.Term.Name.Equals("ASIGNA"))
@@ -213,7 +244,7 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes[0].Term.Name.Equals("C"))
                 {
                     //C
-                    result = ObtenerC(root.ChildNodes[0]);
+                    result = ObtenerC(root.ChildNodes[0], H_AMBITO);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("LISTA_ARRAY"))
                 {
@@ -251,7 +282,7 @@ namespace ChatBot.Compilador
                 {
                     //C;
                     List<object> list = new List<object>();
-                    list.Add(ObtenerC(root.ChildNodes[0]));
+                    list.Add(ObtenerC(root.ChildNodes[0], H_AMBITO));
                     result = list;
                 }
             }
@@ -261,33 +292,128 @@ namespace ChatBot.Compilador
             }
             else if (root.Term.Name.Equals("METODO"))
             {
-                //id + TIPODATO + LISTAPARAMETROS + SENTENCIAS
                 //rmain + TIPODATO + LISTAPARAMETROS + SENTENCIAS;
+                //id + TIPODATO + LISTAPARAMETROS + SENTENCIAS
+                Ambito ambito = new Ambito()
+                {
+                    Fila = root.ChildNodes[0].Token.Location.Line,
+                    Columna = root.ChildNodes[0].Token.Location.Column,
+                    Id = root.ChildNodes[0].Token.ValueString.ToLower(),
+                    Nombre = "METODO",
+                    Sentencias = root.ChildNodes[3]
+                };
+                string tipo = AnalisisSemantico(root.ChildNodes[1]).ToString();
+                List<Variable> parametros = (List < Variable > )AnalisisSemantico(root.ChildNodes[2]);
+                List<Variable> variables;
+                variables = (List < Variable > )AnalisisSemantico(root.ChildNodes[3], tipo);
+
+                ambito.Tipo = tipo;
+                ambito.Parametros = parametros;
+                ambito.Variables = variables;
             }
             else if (root.Term.Name.Equals("LISTAPARAMETROS"))
             {
-                //LISTAPARAMETROS + id + TIPODATO
-                //id + TIPODATO
-                //Empty;
+                if (root.ChildNodes.Count == 3)
+                {
+                    //LISTAPARAMETROS + id + TIPODATO
+                    List<Variable> parametros = (List < Variable > )AnalisisSemantico(root.ChildNodes[0]);
+                    Variable v = new Variable()
+                    {
+                        Fila = root.ChildNodes[1].Token.Location.Line,
+                        Columna = root.ChildNodes[1].Token.Location.Column,
+                        Id = root.ChildNodes[1].Token.ValueString,
+                        Indice = 0,
+                        Ambito = H_AMBITO
+                    };
+                    string tipo = AnalisisSemantico(root.ChildNodes[2]).ToString();
+                    v.Tipo = tipo;
+                    v.Valor = DefaultValue(tipo);
+
+                    result = parametros;
+                }
+                else if (root.ChildNodes.Count == 2)
+                {
+                    //id + TIPODATO
+                    List<Variable> parametros = new List<Variable>();
+                    Variable v = new Variable()
+                    {
+                        Fila = root.ChildNodes[0].Token.Location.Line,
+                        Columna = root.ChildNodes[0].Token.Location.Column,
+                        Id = root.ChildNodes[0].Token.ValueString,
+                        Indice = 0,
+                        Ambito = H_AMBITO
+                    };
+                    string tipo = AnalisisSemantico(root.ChildNodes[1]).ToString();
+                    v.Tipo = tipo;
+                    v.Valor = DefaultValue(tipo);
+
+                    result = parametros;
+                }
+                else //Empty;
+                    result = new List<Variable>();
             }
             else if (root.Term.Name.Equals("SENTENCIAS"))
             {
-                //SENTENCIAS + SENTENCIA
-                //SENTENCIA;
+                if (root.ChildNodes.Count == 2)
+                {
+                    //SENTENCIAS + SENTENCIA
+                    AnalisisSemantico(root.ChildNodes[0]);
+                    AnalisisSemantico(root.ChildNodes[1]);
+                }
+                else
+                {
+                    //SENTENCIA;
+                    AnalisisSemantico(root.ChildNodes[0]);
+                }
             }
             else if (root.Term.Name.Equals("SENTENCIA"))
             {
-                //ASIGNA
-                //DECLARA
-                //LLAMADAMETODO
-                //IMPRIMIR
-                //SENTENCIAFOR
-                //SENTENCIAIF
-                //SENTENCIARETURN
-                //SENTENCIAWHILE
-                //SENTENCIADOWHILE
-                //SENTENCIASWITCH
-                //Empty;
+                if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
+                {
+                    //ASIGNA
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("DECLARA"))
+                {
+                    //DECLARA
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("LLAMADAMETODO"))
+                {
+                    //LLAMADAMETODO
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("IMPRIMIR"))
+                {
+                    //IMPRIMIR
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAFOR"))
+                {
+                    //SENTENCIAFOR
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAIF"))
+                {
+                    //SENTENCIAIF
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIARETURN"))
+                {
+                    //SENTENCIARETURN
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAWHILE"))
+                {
+                    //SENTENCIAWHILE
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIADOWHILE"))
+                {
+                    //SENTENCIADOWHILE
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIASWITCH"))
+                {
+                    //SENTENCIASWITCH
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
+                {
+                    //Empty;
+                }
+                else if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
+                { }
             }
             else if (root.Term.Name.Equals("LLAMADAMETODO"))
             {
@@ -401,11 +527,11 @@ namespace ChatBot.Compilador
 
             return result;
         }
-        
-        private static object NegarE(ParseTreeNode root)
+
+        private static object NegarE(ParseTreeNode root, string H_AMBITO)
         {
             // -E
-            object result = ObtenerE(root);
+            object result = ObtenerE(root, H_AMBITO);
             if (result is int)
                 return (int)result * -1;
             if (result is bool)
@@ -425,7 +551,7 @@ namespace ChatBot.Compilador
             return null;
         }
 
-        private static object ObtenerC(ParseTreeNode root)
+        private static object ObtenerC(ParseTreeNode root, string H_AMBITO)
         {
             object result;
 
@@ -434,29 +560,29 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes[1].Term.Name.Equals("C"))
                 {
                     //C + L + C
-                    object valor1 = ObtenerC(root.ChildNodes[0]);
-                    object valor2 = ObtenerC(root.ChildNodes[2]);
+                    object valor1 = ObtenerC(root.ChildNodes[0], H_AMBITO);
+                    object valor2 = ObtenerC(root.ChildNodes[2], H_AMBITO);
                     result = OperarLogico(valor1, valor2, root.ChildNodes[1]);
                 }
                 else
                 {
                     //E + R + E
-                    object valor1 = ObtenerE(root.ChildNodes[0]);
-                    object valor2 = ObtenerE(root.ChildNodes[2]);
+                    object valor1 = ObtenerE(root.ChildNodes[0], H_AMBITO);
+                    object valor2 = ObtenerE(root.ChildNodes[2], H_AMBITO);
                     result = OperarLogico(valor1, valor2, root.ChildNodes[1]);
                 }
             }
             if (root.ChildNodes.Count == 2)
             {
                 //menos + E
-                result = NegarE(root.ChildNodes[1]);
+                result = NegarE(root.ChildNodes[1], H_AMBITO);
             }
             else
             {
                 //E;
                 try
                 {
-                    result = ObtenerE(root.ChildNodes[0]);
+                    result = ObtenerE(root.ChildNodes[0], H_AMBITO);
                 }
                 catch (Exception ex)
                 {
@@ -476,12 +602,12 @@ namespace ChatBot.Compilador
             return result;
         }
 
-        private static object ObtenerE(ParseTreeNode root)
+        private static object ObtenerE(ParseTreeNode root, string H_AMBITO)
         {
             if (root.ChildNodes.Count == 3)
             {
-                object valor1 = ObtenerE(root.ChildNodes[0]);
-                object valor2 = ObtenerE(root.ChildNodes[2]);
+                object valor1 = ObtenerE(root.ChildNodes[0], H_AMBITO);
+                object valor2 = ObtenerE(root.ChildNodes[2], H_AMBITO);
                 int columna = root.ChildNodes[1].Token.Location.Column;
                 int fila = root.ChildNodes[1].Token.Location.Line;
                 if (valor1 == null || valor2 == null)
@@ -503,7 +629,7 @@ namespace ChatBot.Compilador
             {
                 //E
                 if (root.ChildNodes[0].Token == null)
-                    return ObtenerE(root.ChildNodes[0]);
+                    return ObtenerE(root.ChildNodes[0], H_AMBITO);
                 //rtrue
                 if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("true"))
                     return true;
@@ -514,7 +640,7 @@ namespace ChatBot.Compilador
                 {
                     //id
                     SingletonListas temp = SingletonListas.GetInstance();
-                    return temp.getValue(root.ChildNodes[0].Token.ValueString);
+                    return temp.GetVarValue(root.ChildNodes[0].Token.ValueString, H_AMBITO);
                 }
                 //numentero
                 if (root.ChildNodes[0].Term.Name.ToLower().Equals("int"))
@@ -548,17 +674,17 @@ namespace ChatBot.Compilador
                 if (valor2 is char)
                     return (int)valor1 + (char)valor2;
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) + (int)valor2;
+                    return BoolToInt((bool)valor1) + (int)valor2;
                 if (valor2 is bool)
-                    return (int)valor1 + getValueBool((bool)valor2);
+                    return (int)valor1 + BoolToInt((bool)valor2);
                 return (int)valor1 + (int)valor2;
             }
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) + (double)valor2;
+                    return BoolToInt((bool)valor1) + (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 + getValueBool((bool)valor2);
+                    return (double)valor1 + BoolToInt((bool)valor2);
                 if (valor1 is char)
                     return (char)valor1 + (double)valor2;
                 if (valor2 is char)
@@ -584,7 +710,7 @@ namespace ChatBot.Compilador
                 return (char)valor1 + (char)valor2;
             }
             if (valor1 is bool || valor2 is bool)
-                return getValueBool((bool)valor1) + getValueBool((bool)valor2);
+                return BoolToInt((bool)valor1) + BoolToInt((bool)valor2);
 
             return null;
         }
@@ -612,9 +738,9 @@ namespace ChatBot.Compilador
                 if (valor2 is double)
                     return (int)valor1 - (double)valor2;
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) - (int)valor2;
+                    return BoolToInt((bool)valor1) - (int)valor2;
                 if (valor2 is bool)
-                    return (int)valor1 - getValueBool((bool)valor2);
+                    return (int)valor1 - BoolToInt((bool)valor2);
                 if (valor1 is char)
                     return (char)valor1 - (int)valor2;
                 if (valor2 is char)
@@ -624,9 +750,9 @@ namespace ChatBot.Compilador
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) - (double)valor2;
+                    return BoolToInt((bool)valor1) - (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 - getValueBool((bool)valor2);
+                    return (double)valor1 - BoolToInt((bool)valor2);
                 if (valor1 is char)
                     return (char)valor1 - (double)valor2;
                 if (valor2 is char)
@@ -693,9 +819,9 @@ namespace ChatBot.Compilador
                     return (int)valor1 * (double)valor2;
 
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) * (int)valor2;
+                    return BoolToInt((bool)valor1) * (int)valor2;
                 if (valor2 is bool)
-                    return (int)valor1 * getValueBool((bool)valor2);
+                    return (int)valor1 * BoolToInt((bool)valor2);
 
 
                 if (valor1 is char)
@@ -708,9 +834,9 @@ namespace ChatBot.Compilador
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) * (double)valor2;
+                    return BoolToInt((bool)valor1) * (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 * getValueBool((bool)valor2);
+                    return (double)valor1 * BoolToInt((bool)valor2);
 
                 if (valor1 is char)
                     return (char)valor1 * (double)valor2;
@@ -777,9 +903,9 @@ namespace ChatBot.Compilador
                     return (int)valor1 / (double)valor2;
 
                 if (valor1 is bool)
-                    return (double)(getValueBool((bool)valor1) / (int)valor2);
+                    return (double)(BoolToInt((bool)valor1) / (int)valor2);
                 if (valor2 is bool)
-                    return (double)((int)valor1 / getValueBool((bool)valor2));
+                    return (double)((int)valor1 / BoolToInt((bool)valor2));
 
 
                 if (valor1 is char)
@@ -792,9 +918,9 @@ namespace ChatBot.Compilador
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) / (double)valor2;
+                    return BoolToInt((bool)valor1) / (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 / getValueBool((bool)valor2);
+                    return (double)valor1 / BoolToInt((bool)valor2);
 
                 if (valor1 is char)
                     return (char)valor1 / (double)valor2;
@@ -861,9 +987,9 @@ namespace ChatBot.Compilador
                     return (int)valor1 % (double)valor2;
 
                 if (valor1 is bool)
-                    return (double)(getValueBool((bool)valor1) % (int)valor2);
+                    return (double)(BoolToInt((bool)valor1) % (int)valor2);
                 if (valor2 is bool)
-                    return (double)((int)valor1 % getValueBool((bool)valor2));
+                    return (double)((int)valor1 % BoolToInt((bool)valor2));
 
 
                 if (valor1 is char)
@@ -876,9 +1002,9 @@ namespace ChatBot.Compilador
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return getValueBool((bool)valor1) % (double)valor2;
+                    return BoolToInt((bool)valor1) % (double)valor2;
                 if (valor2 is bool)
-                    return (double)valor1 % getValueBool((bool)valor2);
+                    return (double)valor1 % BoolToInt((bool)valor2);
 
                 if (valor1 is char)
                     return (char)valor1 % (double)valor2;
@@ -950,9 +1076,9 @@ namespace ChatBot.Compilador
                     return Math.Pow((int)valor1, (char)valor2);
 
                 if (valor1 is bool)
-                    return Math.Pow(getValueBool((bool)valor1), (int)valor2);
+                    return Math.Pow(BoolToInt((bool)valor1), (int)valor2);
                 if (valor2 is bool)
-                    return Math.Pow((int)valor1, getValueBool((bool)valor2));
+                    return Math.Pow((int)valor1, BoolToInt((bool)valor2));
 
                 return Math.Pow((int)valor1, (int)valor2);
 
@@ -963,9 +1089,9 @@ namespace ChatBot.Compilador
             if (valor1 is double || valor2 is double)
             {
                 if (valor1 is bool)
-                    return Math.Pow(getValueBool((bool)valor1), (double)valor2);
+                    return Math.Pow(BoolToInt((bool)valor1), (double)valor2);
                 if (valor2 is bool)
-                    return Math.Pow((double)valor1, getValueBool((bool)valor2));
+                    return Math.Pow((double)valor1, BoolToInt((bool)valor2));
 
                 if (valor1 is char)
                     return Math.Pow((char)valor1, (double)valor2);
@@ -1119,6 +1245,23 @@ namespace ChatBot.Compilador
             }
             return null;
         }
+        
+        private static object DefaultValue(string tipo)
+        {
+
+            if (tipo.Equals("int"))
+                return 0;
+            if (tipo.Equals("double"))
+                return 0.0;
+            if (tipo.Equals("string"))
+                return "";
+            if (tipo.Equals("char"))
+                return '\0';
+            if (tipo.Equals("boolean"))
+                return false;
+            return 0;
+        }
+
 
         private static bool VerificarTipo(string tipo, object valor)
         {
@@ -1149,7 +1292,7 @@ namespace ChatBot.Compilador
             return false;
         }
 
-        private static int getValueBool(bool valor)
+        private static int BoolToInt(bool valor)
         {
             return (valor) ? 1 : 0;
         }

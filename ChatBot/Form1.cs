@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
 using ChatBot.Compilador;
 using ChatBot.Objeto;
 using Irony.Parsing;
@@ -28,15 +29,19 @@ namespace ChatBot
                 richTextBoxRestult.Text += "*==================================================*\n";
                 richTextBoxRestult.Text += "*==================================================*\n";
                 richTextBoxRestult.Text += $"* {System.DateTime.Today}\n";
-                foreach (Variable v in s.Variables)
-                {
+                richTextBoxRestult.Text += "*==================================================*\n";
+
+                List<Variable> list = s.GetAmbito().Variables;
+                foreach (Variable v in list)
                     richTextBoxRestult.Text += $"* {v}\n";
-                }
+
                 richTextBoxRestult.Text += "*==================================================*\n";
             }
+            else
+                MessageBox.Show("Arbol Sintáctico Abstracto no generado");
             if (s.Errores.Count > 0)
             {
-                MessageBox.Show("Arbol Sintáctico Abstracto no generado");
+                MessageBox.Show("Se detectaron erorres");
                 richTextBoxRestult.Text += "*==================================================*\n";
                 richTextBoxRestult.Text += "*==================================================*\n";
                 richTextBoxRestult.Text += $"* {System.DateTime.Today}\n";

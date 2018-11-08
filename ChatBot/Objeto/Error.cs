@@ -23,7 +23,7 @@
 
         public override string ToString()
         {
-            return $"Tipo: {Tipo} Columna: {Columna} Fila: {Fila} Fuente: {Fuente} Comentario: {Comentario}";
+            return $"Tipo: {Tipo} Columna: {Columna} Fila: {Fila + 1} Fuente: {Fuente} Comentario: {Comentario}";
         }
     }
 }

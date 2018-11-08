@@ -11,6 +11,14 @@ namespace ChatBot.Compilador
         {
             Variables = new List<Variable>();
             Errores = new List<Error>();
+            Ambitos = new List<Ambito>();
+            Ambito a = new Ambito()
+            {
+                Id = "GLOBAL",
+                Nombre = "GLOBAL",
+                Variables = new List<Variable>()
+            };
+            Ambitos.Add(a);
         }
 
         public static SingletonListas GetInstance()
@@ -23,35 +31,35 @@ namespace ChatBot.Compilador
 
         internal List<Variable> Variables { get; set; }
         internal List<Error> Errores { get; set; }
-        
-        public Variable getVariable(string id)
-        {
-            foreach(Variable v in Variables)
-            {
-                if (v.Id.Equals(id)) return v;
-            }
-            return null;
-        }
+        internal List<Ambito> Ambitos { get; set; }
 
-        public Variable getVariable(string id, string tipo)
+        internal void AddVariableGlobal(List<Variable> variables)
         {
-            foreach (Variable v in Variables)
+            Ambito a = GetAmbito();
+            if (a != null)
+                a.Variables.AddRange(variables);
+        }
+     
+        internal Ambito GetAmbito(string nombre = "GLOBAL", List<Variable> prms = null)
+        {
+            foreach (Ambito a in Ambitos)
             {
-                if (v.Id.Equals(id))
+                if (a.Nombre.Equals(nombre))
                 {
-                    if (v.Tipo.Equals(tipo)) return v;
+                    if (prms == null)
+                        return a;
+                    if (a.CheckParametros(prms))
+                        return a;
                 }
             }
             return null;
         }
-
-        internal object getValue(string valueString)
+        
+        internal object GetVarValue(string nombre, string ambito = "GLOBAL")
         {
-            foreach (Variable v in Variables)
-            {
-                if (v.Id.Equals(valueString))
-                    return v.Valor;
-            }
+            Ambito a = GetAmbito(ambito);
+            if (a != null)
+                return a.GetVarValue(nombre);
 
             return null;
         }

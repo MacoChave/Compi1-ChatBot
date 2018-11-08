@@ -1,7 +1,16 @@
 ﻿namespace ChatBot.Objeto
 {
-    internal class Variable
+    class Variable
     {
+        public string Ambito { get; set; }
+        public int Indice { get; set; }
+        public string Id { get; set; }
+        public string Tipo { get; set; }
+        public object Valor { get; internal set; }
+        public int Fila { get; set; }
+        public int Columna { get; set; }
+        
+
         public Variable()
         {
         }
@@ -30,22 +39,19 @@
             Columna = columna;
         }
 
-        public string Tipo { get; set; }
-        public string Ambito { get; set; }
-        public int Indice { get; set; }
-        public string Id { get; set; }
-        public int Fila { get; set; }
-        public int Columna { get; set; }
-        public object Valor { get; internal set; }
+        public override string ToString()
+        {
+            return $"Indice: {Indice} Nombre: {Id} Tipo: {Tipo} Valor: {Valor} Fila: {Fila + 1} Columna: {Columna}";
+        }
 
         public override bool Equals(object obj)
         {
             return Id.Equals(obj.ToString());
         }
 
-        public override string ToString()
+        public override int GetHashCode()
         {
-            return $"Indice: {Indice} Tipo: {Tipo} Nombre: {Id} Valor: {Valor} Ambito: {Ambito}";
+            return base.GetHashCode();
         }
     }
 }

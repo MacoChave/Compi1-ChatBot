@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Archivos\ControlDOT.cs" />
     <Compile Include="Compilador\Analizador.cs" />
+    <Compile Include="Compilador\Ejecutar.cs" />
     <Compile Include="Compilador\Gramatica.cs" />
     <Compile Include="Compilador\SingletonListas.cs" />
     <Compile Include="Objeto\Ambito.cs" />

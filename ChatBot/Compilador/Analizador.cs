@@ -39,7 +39,7 @@ namespace ChatBot.Compilador
          ***********************     ANALIZADOR SEMÁNTICO     ***********************
          * Comprobar tipos de datos de variables y procedimientos
          ****************************************************************************/
-        public static object AnalisisSemantico (ParseTreeNode root, string H_AMBITO = "GLOBLAL")
+        public static object AnalisisSemantico (ParseTreeNode root, string H_AMBITO = "GLOBLAL", string H_TIPO_PROC = "void", bool H_FLUJO_CONTROL = false)
         {
             object result = null;
 
@@ -108,6 +108,8 @@ namespace ChatBot.Compilador
                 {
                     //METODO
                     Ambito ambito = (Ambito)AnalisisSemantico(root.ChildNodes[0]);
+                    SingletonListas s = SingletonListas.GetInstance();
+                    s.Ambitos.Add(ambito);
                 }
             }
             else if (root.Term.Name.Equals("DECLARA"))
@@ -229,7 +231,6 @@ namespace ChatBot.Compilador
                         list[i].Tipo = tipo;
                     }
                 }
-
                 result = list;
             }
             else if (root.Term.Name.Equals("ASIGNA"))
@@ -304,12 +305,13 @@ namespace ChatBot.Compilador
                 };
                 string tipo = AnalisisSemantico(root.ChildNodes[1]).ToString();
                 List<Variable> parametros = (List < Variable > )AnalisisSemantico(root.ChildNodes[2]);
-                List<Variable> variables;
-                variables = (List < Variable > )AnalisisSemantico(root.ChildNodes[3], tipo);
+                List<Variable> variables = (List < Variable > )AnalisisSemantico(root.ChildNodes[3], H_AMBITO, tipo);
 
                 ambito.Tipo = tipo;
                 ambito.Parametros = parametros;
                 ambito.Variables = variables;
+
+                result = ambito;
             }
             else if (root.Term.Name.Equals("LISTAPARAMETROS"))
             {
@@ -328,6 +330,7 @@ namespace ChatBot.Compilador
                     string tipo = AnalisisSemantico(root.ChildNodes[2]).ToString();
                     v.Tipo = tipo;
                     v.Valor = DefaultValue(tipo);
+                    parametros.Add(v);
 
                     result = parametros;
                 }
@@ -346,6 +349,7 @@ namespace ChatBot.Compilador
                     string tipo = AnalisisSemantico(root.ChildNodes[1]).ToString();
                     v.Tipo = tipo;
                     v.Valor = DefaultValue(tipo);
+                    parametros.Add(v);
 
                     result = parametros;
                 }
@@ -357,13 +361,29 @@ namespace ChatBot.Compilador
                 if (root.ChildNodes.Count == 2)
                 {
                     //SENTENCIAS + SENTENCIA
-                    AnalisisSemantico(root.ChildNodes[0]);
-                    AnalisisSemantico(root.ChildNodes[1]);
+                    List<Variable> vars;
+                    object res;
+                    res = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
+                    if (res != null)
+                        vars = (List<Variable>)res;
+                    else
+                        vars = new List<Variable>();
+                    res = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC);
+                    if (res != null)
+                        vars.AddRange((List < Variable > )res);
+                    result = vars;
                 }
                 else
                 {
                     //SENTENCIA;
-                    AnalisisSemantico(root.ChildNodes[0]);
+                    List<Variable> vars;
+                    object res;
+                    res = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
+                    if (res != null)
+                        vars = (List<Variable>)res;
+                    else
+                        vars = new List<Variable>();
+                    result = vars;
                 }
             }
             else if (root.Term.Name.Equals("SENTENCIA"))
@@ -375,6 +395,7 @@ namespace ChatBot.Compilador
                 else if (root.ChildNodes[0].Term.Name.Equals("DECLARA"))
                 {
                     //DECLARA
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("LLAMADAMETODO"))
                 {
@@ -387,33 +408,37 @@ namespace ChatBot.Compilador
                 else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAFOR"))
                 {
                     //SENTENCIAFOR
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAIF"))
                 {
                     //SENTENCIAIF
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIARETURN"))
                 {
                     //SENTENCIARETURN
+                    AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAWHILE"))
                 {
                     //SENTENCIAWHILE
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIADOWHILE"))
                 {
                     //SENTENCIADOWHILE
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
                 }
                 else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIASWITCH"))
                 {
                     //SENTENCIASWITCH
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
                 }
-                else if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
+                else
                 {
-                    //Empty;
+                    return new List<Variable>();
                 }
-                else if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
-                { }
             }
             else if (root.Term.Name.Equals("LLAMADAMETODO"))
             {
@@ -437,36 +462,53 @@ namespace ChatBot.Compilador
             else if (root.Term.Name.Equals("SENTENCIAFOR"))
             {
                 //rfor + id + TIPODATO + E + C + OP + SENTENCIAS
+                result = AnalisisSemantico(root.ChildNodes[6], H_AMBITO, H_TIPO_PROC, true);
             }
             else if (root.Term.Name.Equals("SENTENCIAIF"))
             {
                 //rif + SENTENCIAIFAUX;
+                result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
             }
             else if (root.Term.Name.Equals("SENTENCIAIFAUX"))
             {
                 //C + SENTENCIAS + SENTENCIAELSEIF;
+                List<Variable> vars = (List < Variable > )AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                vars.AddRange((List < Variable > )AnalisisSemantico(root.ChildNodes[2], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL));
+
+                result = vars;
             }
             else if (root.Term.Name.Equals("SENTENCIAELSEIF"))
             {
                 //relse + SENTPRIMA
                 //Empty;
+                if (root.ChildNodes.Count == 2)
+                    result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                else
+                    result = new List<Variable>();
             }
             else if (root.Term.Name.Equals("SENTPRIMA"))
             {
                 //rif + SENTENCIAIFAUX
                 //SENTENCIAS;
+                if (root.ChildNodes.Count == 2)
+                    result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                else
+                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
             }
             else if (root.Term.Name.Equals("SENTENCIAWHILE"))
             {
                 //rwhile + C + SENTENCIAS;
+                result = AnalisisSemantico(root.ChildNodes[2], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
             }
             else if (root.Term.Name.Equals("SENTENCIADOWHILE"))
             {
                 //rdo + SENTENCIAS + rwhile + C;
+                result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
             }
             else if (root.Term.Name.Equals("SENTENCIASWITCH"))
             {
                 //rswitch + E + SENTENCIAS;
+                result = AnalisisSemantico(root.ChildNodes[2], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
             }
             else if (root.Term.Name.Equals("CONTENIDOSWITCH"))
             {

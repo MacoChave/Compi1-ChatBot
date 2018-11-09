@@ -31,9 +31,11 @@ namespace ChatBot
                 richTextBoxRestult.Text += $"* {System.DateTime.Today}\n";
                 richTextBoxRestult.Text += "*==================================================*\n";
 
-                List<Variable> list = s.GetAmbito().Variables;
-                foreach (Variable v in list)
-                    richTextBoxRestult.Text += $"* {v}\n";
+                foreach(Ambito a in s.Ambitos)
+                {
+                    foreach(Variable v in a.Variables)
+                        richTextBoxRestult.Text += $"* {v}\n";
+                }
 
                 richTextBoxRestult.Text += "*==================================================*\n";
             }

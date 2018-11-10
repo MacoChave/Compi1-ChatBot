@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using ChatBot.Objeto;
 
 namespace ChatBot.Compilador
@@ -32,36 +33,63 @@ namespace ChatBot.Compilador
         internal List<Variable> Variables { get; set; }
         internal List<Error> Errores { get; set; }
         internal List<Ambito> Ambitos { get; set; }
-
-        internal void AddVariableGlobal(List<Variable> variables)
-        {
-            Ambito a = GetAmbito();
-            if (a != null)
-                a.Variables.AddRange(variables);
-        }
-     
-        internal Ambito GetAmbito(string nombre = "GLOBAL", List<Variable> prms = null)
+        
+        internal Ambito GetAmbito(string nombre = "GLOBAL")
         {
             foreach (Ambito a in Ambitos)
             {
-                if (a.Nombre.Equals(nombre))
-                {
-                    if (prms == null)
-                        return a;
-                    if (a.CheckParametros(prms))
-                        return a;
-                }
+                if (a.Id.Equals(nombre))
+                    return a;
             }
             return null;
         }
+
+        internal object GetVarValue(string id, string ambito = "GLOBAL")
+        {
+            Variable v = GetVariable(id, ambito);
+            return v.Valor;
+        }
         
-        internal object GetVarValue(string nombre, string ambito = "GLOBAL")
+        internal void NuevoError(string tipo, string fuente, int fila, int columna, string comentario)
+        {
+            Error e = new Error()
+            {
+                Tipo = tipo,
+                Fuente = fuente,
+                Fila = fila,
+                Columna = columna,
+                Comentario = comentario
+            };
+            Errores.Add(e);
+        }
+
+        internal bool VerificarId(Variable v, string ambito)
+        {
+            Variable var = GetVariable(v.Id, ambito);
+            return var == null;
+        }
+
+        internal Variable GetVariable(string id, string ambito)
         {
             Ambito a = GetAmbito(ambito);
             if (a != null)
-                return a.GetVarValue(nombre);
+            {
+                foreach(Variable v in a.Variables)
+                {
+                    if (v.Id.Equals(id))
+                        return v;
+                }
+            }
+            if (!ambito.Equals("GLOBAL"))
+                return GetVariable(id, "GLOBAL");
 
             return null;
+        }
+
+        internal void AlmacenarVariable(List<Variable> vars, string ambito)
+        {
+            Ambito a = GetAmbito(ambito);
+            a.Variables.AddRange(vars);
         }
     }
 }

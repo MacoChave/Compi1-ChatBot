@@ -41,7 +41,7 @@
 
         public override string ToString()
         {
-            return $"Indice: {Indice} Nombre: {Id} Tipo: {Tipo} Valor: {Valor} Fila: {Fila + 1} Columna: {Columna}";
+            return $"Ambito: {Ambito} Indice: {Indice} Nombre: {Id} Tipo: {Tipo} Valor: {Valor} Fila: {Fila + 1} Columna: {Columna}";
         }
 
         public override bool Equals(object obj)

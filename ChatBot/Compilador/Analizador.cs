@@ -7,19 +7,222 @@ namespace ChatBot.Compilador
 {
     class Analizador : Grammar
     {
+        private static string[,] SUMA = new string[5,5];
+        private static string[,] RESTA = new string[5, 5];
+        private static string[,] MULTIPLICACION = new string[5, 5];
+        private static string[,] DIVISION = new string[5, 5];
+        private static string[,] MODULO = new string[5, 5];
+        private static string[,] POTENCIA = new string[5, 5];
         /****************************************************************************
          *************************     ANALIZADOR LÉXICO     ************************
          ***********************     ANALIZADOR SINTÁCTIO     ***********************
          ****************************************************************************/
-        public static ParseTreeNode Analizar (string cadena)
+        public static ParseTreeNode AnalisisLexicoSintactico (string cadena)
         {
             Gramatica gramatica = new Gramatica();
             LanguageData lenguaje = new LanguageData(gramatica);
             Parser parser = new Parser(lenguaje);
             ParseTree raiz = parser.Parse(cadena);
 
+            LlenarSuma();
+            LlenarResta();
+            LlenarMultiplicación();
+            LlenarDivision();
+            LlenarModulo();
+            LlenarPotencia();
+
             return raiz.Root;
         }
+
+        #region MATRIZ-ARITMETICA
+        private static void LlenarPotencia()
+        {
+            POTENCIA[0, 0] = "";
+            POTENCIA[0, 1] = "double";
+            POTENCIA[0, 2] = "";
+            POTENCIA[0, 3] = "double";
+            POTENCIA[0, 4] = "";
+            POTENCIA[1, 0] = "double";
+            POTENCIA[1, 1] = "double";
+            POTENCIA[1, 2] = "";
+            POTENCIA[1, 3] = "double";
+            POTENCIA[1, 4] = "double";
+            POTENCIA[2, 0] = "";
+            POTENCIA[2, 1] = "";
+            POTENCIA[2, 2] = "";
+            POTENCIA[2, 3] = "";
+            POTENCIA[2, 4] = "";
+            POTENCIA[3, 0] = "double";
+            POTENCIA[3, 1] = "double";
+            POTENCIA[3, 2] = "";
+            POTENCIA[3, 3] = "int";
+            POTENCIA[3, 4] = "int";
+            POTENCIA[4, 0] = "";
+            POTENCIA[4, 1] = "double";
+            POTENCIA[4, 2] = "";
+            POTENCIA[4, 3] = "double";
+            POTENCIA[4, 4] = "double";
+        }
+
+        private static void LlenarModulo()
+        {
+            MODULO[0, 0] = "";
+            MODULO[0, 1] = "double";
+            MODULO[0, 2] = "";
+            MODULO[0, 3] = "double";
+            MODULO[0, 4] = "";
+            MODULO[1, 0] = "double";
+            MODULO[1, 1] = "double";
+            MODULO[1, 2] = "";
+            MODULO[1, 3] = "double";
+            MODULO[1, 4] = "double";
+            MODULO[2, 0] = "";
+            MODULO[2, 1] = "";
+            MODULO[2, 2] = "";
+            MODULO[2, 3] = "";
+            MODULO[2, 4] = "";
+            MODULO[3, 0] = "double";
+            MODULO[3, 1] = "double";
+            MODULO[3, 2] = "";
+            MODULO[3, 3] = "double";
+            MODULO[3, 4] = "double";
+            MODULO[4, 0] = "";
+            MODULO[4, 1] = "double";
+            MODULO[4, 2] = "";
+            MODULO[4, 3] = "double";
+            MODULO[4, 4] = "double";
+        }
+
+        private static void LlenarDivision()
+        {
+            DIVISION[0, 0] = "";
+            DIVISION[0, 1] = "double";
+            DIVISION[0, 2] = "";
+            DIVISION[0, 3] = "double";
+            DIVISION[0, 4] = "";
+            DIVISION[1, 0] = "double";
+            DIVISION[1, 1] = "double";
+            DIVISION[1, 2] = "";
+            DIVISION[1, 3] = "double";
+            DIVISION[1, 4] = "double";
+            DIVISION[2, 0] = "";
+            DIVISION[2, 1] = "";
+            DIVISION[2, 2] = "";
+            DIVISION[2, 3] = "";
+            DIVISION[2, 4] = "";
+            DIVISION[3, 0] = "double";
+            DIVISION[3, 1] = "double";
+            DIVISION[3, 2] = "";
+            DIVISION[3, 3] = "double";
+            DIVISION[3, 4] = "double";
+            DIVISION[4, 0] = "";
+            DIVISION[4, 1] = "double";
+            DIVISION[4, 2] = "";
+            DIVISION[4, 3] = "double";
+            DIVISION[4, 4] = "double";
+        }
+
+        private static void LlenarMultiplicación()
+        {
+            MULTIPLICACION[0, 0] = "";
+            MULTIPLICACION[0, 1] = "double";
+            MULTIPLICACION[0, 2] = "";
+            MULTIPLICACION[0, 3] = "int";
+            MULTIPLICACION[0, 4] = "";
+            MULTIPLICACION[1, 0] = "double";
+            MULTIPLICACION[1, 1] = "double";
+            MULTIPLICACION[1, 2] = "";
+            MULTIPLICACION[1, 3] = "double";
+            MULTIPLICACION[1, 4] = "double";
+            MULTIPLICACION[2, 0] = "";
+            MULTIPLICACION[2, 1] = "";
+            MULTIPLICACION[2, 2] = "";
+            MULTIPLICACION[2, 3] = "";
+            MULTIPLICACION[2, 4] = "";
+            MULTIPLICACION[3, 0] = "int";
+            MULTIPLICACION[3, 1] = "double";
+            MULTIPLICACION[3, 2] = "";
+            MULTIPLICACION[3, 3] = "int";
+            MULTIPLICACION[3, 4] = "int";
+            MULTIPLICACION[4, 0] = "";
+            MULTIPLICACION[4, 1] = "double";
+            MULTIPLICACION[4, 2] = "";
+            MULTIPLICACION[4, 3] = "int";
+            MULTIPLICACION[4, 4] = "int";
+        }
+
+        private static void LlenarResta()
+        {
+            RESTA[0, 0] = "";
+            RESTA[0, 1] = "double";
+            RESTA[0, 2] = "";
+            RESTA[0, 3] = "int";
+            RESTA[0, 4] = "";
+            RESTA[1, 0] = "double";
+            RESTA[1, 1] = "double";
+            RESTA[1, 2] = "";
+            RESTA[1, 3] = "double";
+            RESTA[1, 4] = "double";
+            RESTA[2, 0] = "";
+            RESTA[2, 1] = "";
+            RESTA[2, 2] = "";
+            RESTA[2, 3] = "";
+            RESTA[2, 4] = "";
+            RESTA[3, 0] = "int";
+            RESTA[3, 1] = "double";
+            RESTA[3, 2] = "";
+            RESTA[3, 3] = "int";
+            RESTA[3, 4] = "int";
+            RESTA[4, 0] = "";
+            RESTA[4, 1] = "double";
+            RESTA[4, 2] = "";
+            RESTA[4, 3] = "int";
+            RESTA[4, 4] = "int";
+        }
+
+        private static void LlenarSuma()
+        {
+            SUMA[0, 0] = "double";
+            SUMA[0, 1] = "double";
+            SUMA[0, 2] = "string";
+            SUMA[0, 3] = "int";
+            SUMA[0, 4] = "";
+            SUMA[1, 0] = "double";
+            SUMA[1, 1] = "double";
+            SUMA[1, 2] = "string";
+            SUMA[1, 3] = "double";
+            SUMA[1, 4] = "double";
+            SUMA[2, 0] = "string";
+            SUMA[2, 1] = "string";
+            SUMA[2, 2] = "string";
+            SUMA[2, 3] = "string";
+            SUMA[2, 4] = "string";
+            SUMA[3, 0] = "int";
+            SUMA[3, 1] = "double";
+            SUMA[3, 2] = "string";
+            SUMA[3, 3] = "int";
+            SUMA[3, 4] = "int";
+            SUMA[4, 0] = "";
+            SUMA[4, 1] = "double";
+            SUMA[4, 2] = "string";
+            SUMA[4, 3] = "int";
+            SUMA[4, 4] = "int";
+        }
+        
+        private static int EnumTipoDato(string tipo)
+        {
+            switch (tipo)
+            {
+                case "boolean": return 0;
+                case "double": return 1;
+                case "string": return 2;
+                case "int": return 3;
+                case "char": return 4;
+                case "void": return 5;
+                default: return -1;
+            }
+        }
+        #endregion
 
         /****************************************************************************
          ****************     GENERAR ÁRBOL DE SINTÁXIS ABSTRACTA     ***************
@@ -39,633 +242,448 @@ namespace ChatBot.Compilador
          ***********************     ANALIZADOR SEMÁNTICO     ***********************
          * Comprobar tipos de datos de variables y procedimientos
          ****************************************************************************/
-        public static object AnalisisSemantico (ParseTreeNode root, string H_AMBITO = "GLOBLAL", string H_TIPO_PROC = "void", bool H_FLUJO_CONTROL = false)
+        public static object AnalisisSemantico (ParseTreeNode root)
         {
             object result = null;
 
             if (root.Term.Name.Equals("INICIO"))
             {
-                //IMPORTES + CUERPO;
-                AnalisisSemantico(root.ChildNodes[1]);
-            }
-            else if (root.Term.Name.Equals("IMPORTES"))
-            {
-                //IMPORTES.Rule = IMPORTES + IMPORTE
-                //              | IMPORTE
-                //              | Empty;
-            }
-            else if (root.Term.Name.Equals("IMPORTE"))
-            {
-                //IMPORTE.Rule = importar + importaciones + fin;
-            }
-            else if (root.Term.Name.Equals("CUERPO"))
-            {
-                if (root.ChildNodes.Count == 2)
-                {
-                    //CUERPO + CONTENIDOGENERAL
-                    AnalisisSemantico(root.ChildNodes[0]);
-                    AnalisisSemantico(root.ChildNodes[1]);
-                }
-                else
-                {
-                    //CONTENIDOGENERAL;
-                    AnalisisSemantico(root.ChildNodes[0]);
-                }
-            }
-            else if (root.Term.Name.Equals("CONTENIDOGENERAL"))
-            {
-                if (root.ChildNodes[0].Term.Name.Equals("DECLARA"))
-                {
-                    //DECLARA
-                    SingletonListas s = SingletonListas.GetInstance();
-                    List<Variable> lista = (List < Variable > )AnalisisSemantico(root.ChildNodes[0]);
-                    foreach (Variable v in lista)
-                    {
-                        v.Ambito = "GENERAL";
-                        if (s.GetVarValue(v.Id) != null)
-                        {
-                            Error e = new Error()
-                            {
-                                Tipo = "Semántico",
-                                Fuente = v.Id,
-                                Columna = v.Columna,
-                                Fila = v.Fila,
-                                Comentario = $"{v.Id} ya se encuentra declarada"
-                            };
-                            s.Errores.Add(e);
-                            lista.Remove(v);
-                        }
-                    }
-
-                    s.AddVariableGlobal(lista);
-                }
-                if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
-                {
-                    //ASIGNA
-
-                }
-                if (root.ChildNodes[0].Term.Name.Equals("METODO"))
-                {
-                    //METODO
-                    Ambito ambito = (Ambito)AnalisisSemantico(root.ChildNodes[0]);
-                    SingletonListas s = SingletonListas.GetInstance();
-                    s.Ambitos.Add(ambito);
-                }
-            }
-            else if (root.Term.Name.Equals("DECLARA"))
-            {
-                List<Variable> list;
-                string tipo = (string)AnalisisSemantico(root.ChildNodes[1]);
-
-                if (root.ChildNodes.Count == 3)
-                {
-                    //LISTA_IDS + TIPODATO + VALOR
-                    object valor;
-                    if (root.ChildNodes[0].Token == null)
-                        list = (List< Variable >)AnalisisSemantico(root.ChildNodes[0]);
-                    else
-                    {
-                        //id + TIPODATO + VALOR
-                        list = new List<Variable>();
-                        Variable v = new Variable()
-                        {
-                            Id = root.ChildNodes[0].Token.ValueString,
-                            Fila = root.ChildNodes[0].Token.Location.Line,
-                            Columna = root.ChildNodes[0].Token.Location.Column,
-                            Tipo = tipo,
-                            Valor = DefaultValue(tipo)
-                        };
-                        list.Add(v);
-                    }
-                    
-                    if (root.ChildNodes[2].ChildNodes.Count > 0)
-                    {
-                        valor = AnalisisSemantico(root.ChildNodes[2]);
-                        if (valor == null)
-                        {
-                            list.Clear();
-                            return list;
-                        }
-                        foreach(Variable v in list)
-                        {
-                            v.Tipo = tipo;
-                            v.Valor = valor;
-                        }
-                        if (!VerificarTipo(tipo, valor))
-                        {
-                            SingletonListas s = SingletonListas.GetInstance();
-                            Error e = new Error()
-                            {
-                                Tipo = "Semántico",
-                                Fuente = list[list.Count - 1].Id,
-                                Columna = list[list.Count - 1].Columna,
-                                Fila = list[list.Count - 1].Fila,
-                                Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {valor.GetType()}"
-                            };
-                            s.Errores.Add(e);
-                            list.Clear();
-                        }
-                    }
-                }
-                else
-                {
-                    //id + TIPODATO + E + VALOR;
-                    List<object> valor;
-                    list = new List<Variable>();
-                    string id = root.ChildNodes[0].Token.ValueString;
-                    int tam = (int)AnalisisSemantico(root.ChildNodes[2]);
-
-                    for (int i = 0; i < tam; i++)
-                    {
-                        Variable v = new Variable()
-                        {
-                            Indice = i,
-                            Id = id,
-                            Tipo = tipo,
-                            Valor = DefaultValue(tipo),
-                            Fila = root.ChildNodes[0].Token.Location.Line,
-                            Columna = root.ChildNodes[0].Token.Location.Column,
-                        };
-                        list.Add(v);
-                    }
-
-                    valor = (List< object >)AnalisisSemantico(root.ChildNodes[3]);
-                    if (valor.Count == 0) return list;
-                    if (list.Count != valor.Count)
-                    {
-                        SingletonListas s = SingletonListas.GetInstance();
-                        Error e = new Error()
-                        {
-                            Tipo = "Semántico",
-                            Fuente = list[list.Count - 1].Id,
-                            Columna = list[list.Count - 1].Columna,
-                            Fila = list[list.Count - 1].Fila,
-                            Comentario = $"Dimension incorrecta"
-                        };
-                        s.Errores.Add(e);
-                        list.Clear();
-                        return list;
-                    }
-                    foreach (object o in valor)
-                    {
-                        if (!VerificarTipo(tipo, o))
-                        {
-                            SingletonListas s = SingletonListas.GetInstance();
-                            Error e = new Error()
-                            {
-                                Tipo = "Semántico",
-                                Fuente = list[list.Count - 1].Id,
-                                Columna = list[list.Count - 1].Columna,
-                                Fila = list[list.Count - 1].Fila,
-                                Comentario = $"No se puede convertir implícitamente el tipo {tipo} con {o.GetType()}"
-                            };
-                            s.Errores.Add(e);
-                            list.Clear();
-                            return list;
-                        }
-
-                    }
-                    for (int i = 0; i < list.Count; i++)
-                    {
-                        list[i].Valor = valor[i];
-                        list[i].Tipo = tipo;
-                    }
-                }
-                result = list;
-            }
-            else if (root.Term.Name.Equals("ASIGNA"))
-            {
-                //id + C
-                //id + LISTA_ARRAY
-                //id + E + C
-                //id + E + id + E
-            }
-            else if (root.Term.Name.Equals("VALOR"))
-            {
-                if (root.ChildNodes[0].Term.Name.Equals("C"))
-                {
-                    //C
-                    result = ObtenerC(root.ChildNodes[0], H_AMBITO);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("LISTA_ARRAY"))
-                {
-                    //LISTA_ARRAY
-                    result = AnalisisSemantico(root.ChildNodes[0]);
-                }
-            }
-            else if (root.Term.Name.Equals("LISTA_IDS"))
-            {
-                if (root.ChildNodes.Count == 2)
-                {
-                    //LISTA_IDS + id
-                    List<Variable> list = (List < Variable > )AnalisisSemantico(root.ChildNodes[0]);
-                    list.Add(new Variable(root.ChildNodes[1].Token.ValueString, root.ChildNodes[1].Token.Location.Line, root.ChildNodes[1].Token.Location.Column));
-                    result = list;
-                }
-                else
-                {
-                    //id;
-                    List<Variable> list = new List<Variable>();
-                    list.Add(new Variable(root.ChildNodes[0].Token.ValueString, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column));
-                    result = list;
-                }
-            }
-            else if (root.Term.Name.Equals("LISTA_ARRAY"))
-            {
-                if (root.ChildNodes.Count == 2)
-                {
-                    //LISTA_ARRAY + C
-                    List<object> list = (List< object >)AnalisisSemantico(root.ChildNodes[0]);
-                    list.Add(root.ChildNodes[1]);
-                    result = list;
-                }
-                else
-                {
-                    //C;
-                    List<object> list = new List<object>();
-                    list.Add(ObtenerC(root.ChildNodes[0], H_AMBITO));
-                    result = list;
-                }
-            }
-            else if (root.Term.Name.Equals("TIPODATO"))
-            {
-                return root.ChildNodes[0].Token.ValueString.ToLower();
+                //INICIO.Rule = IMPORTES + CUERPO;
+                AnalizarImportacion(root.ChildNodes[0]);
+                AnalizarCuerpo(root.ChildNodes[1]);
             }
             else if (root.Term.Name.Equals("METODO"))
             {
-                //rmain + TIPODATO + LISTAPARAMETROS + SENTENCIAS;
-                //id + TIPODATO + LISTAPARAMETROS + SENTENCIAS
-                Ambito ambito = new Ambito()
-                {
-                    Fila = root.ChildNodes[0].Token.Location.Line,
-                    Columna = root.ChildNodes[0].Token.Location.Column,
-                    Id = root.ChildNodes[0].Token.ValueString.ToLower(),
-                    Nombre = "METODO",
-                    Sentencias = root.ChildNodes[3]
-                };
-                string tipo = AnalisisSemantico(root.ChildNodes[1]).ToString();
-                List<Variable> parametros = (List < Variable > )AnalisisSemantico(root.ChildNodes[2]);
-                List<Variable> variables = (List < Variable > )AnalisisSemantico(root.ChildNodes[3], H_AMBITO, tipo);
+                //METODO.Rule = id + dospuntos + TIPODATO + apar + LISTAPARAMETROS + cpar + alla + SENTENCIAS + clla
+                //            | rmain + dospuntos + TIPODATO + apar + LISTAPARAMETROS + cpar + alla + SENTENCIAS + clla;
 
-                ambito.Tipo = tipo;
-                ambito.Parametros = parametros;
-                ambito.Variables = variables;
-
-                result = ambito;
             }
             else if (root.Term.Name.Equals("LISTAPARAMETROS"))
             {
-                if (root.ChildNodes.Count == 3)
-                {
-                    //LISTAPARAMETROS + id + TIPODATO
-                    List<Variable> parametros = (List < Variable > )AnalisisSemantico(root.ChildNodes[0]);
-                    Variable v = new Variable()
-                    {
-                        Fila = root.ChildNodes[1].Token.Location.Line,
-                        Columna = root.ChildNodes[1].Token.Location.Column,
-                        Id = root.ChildNodes[1].Token.ValueString,
-                        Indice = 0,
-                        Ambito = H_AMBITO
-                    };
-                    string tipo = AnalisisSemantico(root.ChildNodes[2]).ToString();
-                    v.Tipo = tipo;
-                    v.Valor = DefaultValue(tipo);
-                    parametros.Add(v);
+                //LISTAPARAMETROS.Rule = LISTAPARAMETROS + coma + id + dospuntos + TIPODATO
+                //                     | id + dospuntos + TIPODATO
+                //                     | Empty;
 
-                    result = parametros;
-                }
-                else if (root.ChildNodes.Count == 2)
-                {
-                    //id + TIPODATO
-                    List<Variable> parametros = new List<Variable>();
-                    Variable v = new Variable()
-                    {
-                        Fila = root.ChildNodes[0].Token.Location.Line,
-                        Columna = root.ChildNodes[0].Token.Location.Column,
-                        Id = root.ChildNodes[0].Token.ValueString,
-                        Indice = 0,
-                        Ambito = H_AMBITO
-                    };
-                    string tipo = AnalisisSemantico(root.ChildNodes[1]).ToString();
-                    v.Tipo = tipo;
-                    v.Valor = DefaultValue(tipo);
-                    parametros.Add(v);
-
-                    result = parametros;
-                }
-                else //Empty;
-                    result = new List<Variable>();
             }
             else if (root.Term.Name.Equals("SENTENCIAS"))
             {
-                if (root.ChildNodes.Count == 2)
-                {
-                    //SENTENCIAS + SENTENCIA
-                    List<Variable> vars;
-                    object res;
-                    res = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
-                    if (res != null)
-                        vars = (List<Variable>)res;
-                    else
-                        vars = new List<Variable>();
-                    res = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC);
-                    if (res != null)
-                        vars.AddRange((List < Variable > )res);
-                    result = vars;
-                }
-                else
-                {
-                    //SENTENCIA;
-                    List<Variable> vars;
-                    object res;
-                    res = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
-                    if (res != null)
-                        vars = (List<Variable>)res;
-                    else
-                        vars = new List<Variable>();
-                    result = vars;
-                }
+                //SENTENCIAS.Rule = SENTENCIAS + SENTENCIA
+                //                | SENTENCIA;
+
             }
             else if (root.Term.Name.Equals("SENTENCIA"))
             {
-                if (root.ChildNodes[0].Term.Name.Equals("ASIGNA"))
-                {
-                    //ASIGNA
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("DECLARA"))
-                {
-                    //DECLARA
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("LLAMADAMETODO"))
-                {
-                    //LLAMADAMETODO
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("IMPRIMIR"))
-                {
-                    //IMPRIMIR
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAFOR"))
-                {
-                    //SENTENCIAFOR
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAIF"))
-                {
-                    //SENTENCIAIF
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIARETURN"))
-                {
-                    //SENTENCIARETURN
-                    AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIAWHILE"))
-                {
-                    //SENTENCIAWHILE
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIADOWHILE"))
-                {
-                    //SENTENCIADOWHILE
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
-                }
-                else if (root.ChildNodes[0].Term.Name.Equals("SENTENCIASWITCH"))
-                {
-                    //SENTENCIASWITCH
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, true);
-                }
-                else
-                {
-                    return new List<Variable>();
-                }
+                //SENTENCIA.Rule = ASIGNA
+                //                | DECLARA
+                //                | LLAMADAMETODO + fin
+                //                | IMPRIMIR
+                //                | SENTENCIAFOR
+                //                | SENTENCIAIF
+                //                | SENTENCIARETURN
+                //                | SENTENCIAWHILE
+                //                | SENTENCIADOWHILE
+                //                | SENTENCIASWITCH
+                //                | Empty;
+
             }
             else if (root.Term.Name.Equals("LLAMADAMETODO"))
             {
-                //id + PARAMETROSLLAMADOS
-                //id;
+                //LLAMADAMETODO.Rule = id + apar + PARAMETROSLLAMADOS + cpar
+                //                    | id + apar + cpar;
+
             }
             else if (root.Term.Name.Equals("PARAMETROSLLAMADOS"))
             {
-                //PARAMETROSLLAMADOS + C
-                //C;
+                //PARAMETROSLLAMADOS.Rule = PARAMETROSLLAMADOS + coma + C
+                //                        | C;
+
             }
             else if (root.Term.Name.Equals("IMPRIMIR"))
             {
-                //rprint + C;
+                //IMPRIMIR.Rule = rprint + apar + C + cpar;
+
             }
             else if (root.Term.Name.Equals("SENTENCIARETURN"))
             {
-                //C
-                //;
+                //SENTENCIARETURN.Rule = C + fin
+                //                      | fin;
+
             }
             else if (root.Term.Name.Equals("SENTENCIAFOR"))
             {
-                //rfor + id + TIPODATO + E + C + OP + SENTENCIAS
-                result = AnalisisSemantico(root.ChildNodes[6], H_AMBITO, H_TIPO_PROC, true);
+                //SENTENCIAFOR.Rule = rfor + apar + id + dospuntos + TIPODATO + igual1 + E + fin + C + fin + OP + cpar + alla + SENTENCIAS + clla;
+
             }
             else if (root.Term.Name.Equals("SENTENCIAIF"))
             {
-                //rif + SENTENCIAIFAUX;
-                result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                //SENTENCIAIF.Rule = rif + SENTENCIAIFAUX;
+
             }
             else if (root.Term.Name.Equals("SENTENCIAIFAUX"))
             {
-                //C + SENTENCIAS + SENTENCIAELSEIF;
-                List<Variable> vars = (List < Variable > )AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
-                vars.AddRange((List < Variable > )AnalisisSemantico(root.ChildNodes[2], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL));
+                //SENTENCIAIFAUX.Rule = apar + C + cpar + alla + SENTENCIAS + clla + SENTENCIAELSEIF;
 
-                result = vars;
             }
             else if (root.Term.Name.Equals("SENTENCIAELSEIF"))
             {
-                //relse + SENTPRIMA
-                //Empty;
-                if (root.ChildNodes.Count == 2)
-                    result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
-                else
-                    result = new List<Variable>();
+                //SENTENCIAELSEIF.Rule = relse + SENTPRIMA
+                //                      | Empty;
+
             }
             else if (root.Term.Name.Equals("SENTPRIMA"))
             {
-                //rif + SENTENCIAIFAUX
-                //SENTENCIAS;
-                if (root.ChildNodes.Count == 2)
-                    result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
-                else
-                    result = AnalisisSemantico(root.ChildNodes[0], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                //SENTPRIMA.Rule = rif + SENTENCIAIFAUX
+                //                | alla + SENTENCIAS + clla;
+
             }
             else if (root.Term.Name.Equals("SENTENCIAWHILE"))
             {
-                //rwhile + C + SENTENCIAS;
-                result = AnalisisSemantico(root.ChildNodes[2], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                //SENTENCIAWHILE.Rule = rwhile + apar + C + cpar + alla + SENTENCIAS + clla;
+
             }
             else if (root.Term.Name.Equals("SENTENCIADOWHILE"))
             {
-                //rdo + SENTENCIAS + rwhile + C;
-                result = AnalisisSemantico(root.ChildNodes[1], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                //SENTENCIADOWHILE.Rule = rdo + alla + SENTENCIAS + clla + rwhile + apar + C + cpar + fin;
+
             }
             else if (root.Term.Name.Equals("SENTENCIASWITCH"))
             {
-                //rswitch + E + SENTENCIAS;
-                result = AnalisisSemantico(root.ChildNodes[2], H_AMBITO, H_TIPO_PROC, H_FLUJO_CONTROL);
+                //SENTENCIASWITCH.Rule = rswitch + apar + E + cpar + alla + SENTENCIAS + clla;
+
             }
             else if (root.Term.Name.Equals("CONTENIDOSWITCH"))
             {
-                //CASOS + DEFECTO
-                //CASOS
-                //DEFECTO
-                //Empty;
+                //CONTENIDOSWITCH.Rule = CASOS + DEFECTO
+                //                      | CASOS
+                //                      | DEFECTO
+                //                      | Empty;
+
             }
             else if (root.Term.Name.Equals("CASOS"))
             {
-                //CASOS + CASO
-                //CASO;
+                //CASOS.Rule = CASOS + CASO
+                //           | CASO;
+
             }
             else if (root.Term.Name.Equals("CASO"))
             {
-                //rcase + EXPRESION + SENTENCIAS + rbreak;
+                //CASO.Rule = rcase + C + dospuntos + SENTENCIAS + rbreak + fin;
+
             }
             else if (root.Term.Name.Equals("DEFECTO"))
             {
-                //defecto + SENTENCIAS;
+                //DEFECTO.Rule = defecto + SENTENCIAS + dospuntos;
+
             }
             else if (root.Term.Name.Equals("ASIGNACION_CORTO"))
             {
-                //id + OP;
-                bool incremento = (bool)AnalisisSemantico(root.ChildNodes[1]);
-                if (incremento)
-                {
-                    // OBTENER INCREMENTO DE VARIABLE
-                }
-                else
-                {
-                    // OBTENER DECREMENTO DE VARIABLE
-                }
-            }
-            else if (root.Term.Name.Equals("OP"))
-            {
-                //incremento | decremento;
-                if (root.ChildNodes[0].Token.ValueString.Equals("++"))
-                    result = true;
-                else
-                    return false;
+                //ASIGNACION_CORTO.Rule = id + OP;
+
             }
             else if (root.Term.Name.Equals("INVOCAR"))
             {
-                //id + LIST_ATRIBUTO
-                //ACCESO_VECTOR;
+                //INVOCAR.Rule = id + apar + LIST_ATRIBUTO + cpar
+                //             | ACCESO_VECTOR;
+
             }
             else if (root.Term.Name.Equals("LIST_ATRIBUTO"))
             {
-                //LIST_ATRIBUTO + ATRIBUTO
-                //ATRIBUTO
-                //Empty;
+                //LIST_ATRIBUTO.Rule = LIST_ATRIBUTO + coma + ATRIBUTO
+                //                   | ATRIBUTO
+                //                   | Empty;
+
             }
             else if (root.Term.Name.Equals("ATRIBUTO"))
             {
-                //E;
+                //ATRIBUTO.Rule = E;
+
             }
 
             return result;
         }
-
-        private static object NegarE(ParseTreeNode root, string H_AMBITO)
+        
+        #region IMPORTACION
+        private static void AnalizarImportacion(ParseTreeNode root)
         {
-            // -E
-            object result = ObtenerE(root, H_AMBITO);
-            if (result is int)
-                return (int)result * -1;
-            if (result is bool)
-                return !(bool)result;
-            if (result is double)
-                return (double)result * -1;
-
-            SingletonListas s = SingletonListas.GetInstance();
-            Error e = new Error()
+            if (root.Term.Name.Equals("IMPORTES"))
             {
-                Tipo = "Semántico",
-                Columna = root.ChildNodes[0].Token.Location.Column,
-                Fila = root.ChildNodes[0].Token.Location.Line,
-                Fuente = "-",
-                Comentario = $"{result.ToString()} tiene tipo incompatible, no se puede negar."
-            };
-            return null;
+                //IMPORTES.Rule = IMPORTES + IMPORTE
+                //              | IMPORTE
+                //              | Empty;
+
+            }
+            else if (root.Term.Name.Equals("IMPORTE"))
+            {
+                //IMPORTE.Rule = importar + importaciones + fin;
+
+            }
+        }
+        #endregion
+
+        #region CUERPO
+        private static void AnalizarCuerpo(ParseTreeNode root)
+        {
+            if (root.Term.Name.Equals("CUERPO"))
+            {
+                //CUERPO.Rule = CUERPO + CONTENIDOGENERAL
+                //            | CONTENIDOGENERAL;
+                if (root.ChildNodes.Count == 2)
+                {
+                    AnalizarCuerpo(root.ChildNodes[0]);
+                    AnalizarCuerpo(root.ChildNodes[1]);
+                }
+                else
+                    AnalizarCuerpo(root.ChildNodes[0]);
+            }
+            else if (root.Term.Name.Equals("CONTENIDOGENERAL"))
+            {
+                //CONTENIDOGENERAL.Rule = DECLARA
+                //                       | ASIGNA
+                //                       | METODO;
+                if (root.ChildNodes[0].Term.Name.Equals("DECLARA"))
+                    AnalizarVariables(root.ChildNodes[0]);
+                else if (root.ChildNodes[0].Term.Name.Equals("METODO"))
+                    AnalizarMetodos(root.ChildNodes[0]);
+            }
+        }
+        #endregion
+
+        #region VARIABLES
+        private static object AnalizarVariables(ParseTreeNode root, string H_AMBITO = "GLOBAL")
+        {
+            object result = null;
+
+            if (root.Term.Name.Equals("DECLARA"))
+            {
+                DeclaracionVariable(root, H_AMBITO);
+            }
+            else if (root.Term.Name.Equals("ASIGNA"))
+            {
+
+            }
+            return result;
         }
 
-        private static object ObtenerC(ParseTreeNode root, string H_AMBITO)
+        private static void DeclaracionVariable(ParseTreeNode root, string H_AMBITO)
         {
-            object result;
+            //DECLARA.Rule = id + TIPODATO + VALOR
+            //             | LISTA_IDS + TIPODATO + VALOR
+            //             | id + TIPODATO + E + VALOR;
+            SingletonListas s = SingletonListas.GetInstance();
+
+            if (root.ChildNodes.Count == 3)
+            {
+                List<Variable> vars;
+                string tipoDato = ObtenerTipoDato(root.ChildNodes[1]);
+                string tipoDatoValor = tipoDato;
+                if (root.ChildNodes[2].Token != null)
+                    tipoDatoValor = ObtenerTipoDatoValor(root.ChildNodes[2], H_AMBITO);
+
+                if (root.ChildNodes[0].Token == null)
+                {
+                    vars = ObtenerListaId(root.ChildNodes[0], H_AMBITO);
+                    foreach (Variable v in vars)
+                        v.Tipo = tipoDato;
+                }
+                else
+                {
+                    vars = new List<Variable>()
+                        {
+                            new Variable(root.ChildNodes[0].Token.ValueString, tipoDato, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column)
+                        };
+                }
+
+                int fila = vars[vars.Count - 1].Fila;
+                int columna = vars[vars.Count - 1].Columna;
+                string id = vars[vars.Count - 1].Id;
+
+                if (tipoDato.Equals(tipoDatoValor))
+                    s.AlmacenarVariable(vars, H_AMBITO);
+                else
+                    s.NuevoError(H_AMBITO, id, fila, columna, "Tipo de datos no coinciden");
+            }
+            else
+            {
+
+            }
+        }
+
+        private static List<Variable> ObtenerListaId(ParseTreeNode root, string H_AMBITO)
+        {
+            //LISTA_IDS.Rule = LISTA_IDS + id
+            //                | id;
+            SingletonListas s = SingletonListas.GetInstance();
+            if (root.ChildNodes.Count == 2)
+            {
+                List<Variable> vars = ObtenerListaId(root.ChildNodes[0], H_AMBITO);
+                Variable v = new Variable()
+                {
+                    Indice = 0,
+                    Ambito = H_AMBITO,
+                    Columna = root.ChildNodes[1].Token.Location.Column,
+                    Fila = root.ChildNodes[1].Token.Location.Line,
+                    Id = root.ChildNodes[1].Token.ValueString
+                };
+                if (s.VerificarId(v, H_AMBITO))
+                    vars.Add(v);
+                else
+                    s.NuevoError(v.Ambito, v.Id, v.Fila, v.Columna, $"Ya se encuentra declarada la variable {v.Id}");
+
+                return vars;
+            }
+            else
+            {
+                List<Variable> vars = new List<Variable>();
+                Variable v = new Variable()
+                {
+                    Indice = 0,
+                    Ambito = H_AMBITO,
+                    Columna = root.ChildNodes[0].Token.Location.Column,
+                    Fila = root.ChildNodes[0].Token.Location.Line,
+                    Id = root.ChildNodes[0].Token.ValueString
+                };
+                if (s.VerificarId(v, H_AMBITO))
+                    vars.Add(v);
+                else
+                    s.NuevoError(v.Ambito, v.Id, v.Fila, v.Columna, $"Ya se encuentra declarada la variable {v.Id}");
+
+                return vars;
+            }
+        }
+
+        private static void ObtenerListaArray(ParseTreeNode root)
+        {
+            //LISTA_ARRAY.Rule = LISTA_ARRAY + coma + C
+            //                | C;
+
+        }
+
+        private static void AsignacionVariable(ParseTreeNode root, string H_AMBITO = "GLOBAL")
+        {
+            //ASIGNA.Rule = id + igual1 + C + fin
+            //            | id + igual1 + alla + LISTA_ARRAY + clla + fin
+            //            | id + acor + E + ccor + igual1 + C + fin
+            //            | id + acor + E + ccor + igual1 + id + acor + E + ccor + fin;
+
+        }
+
+        private static string ObtenerTipoDato(ParseTreeNode root)
+        {
+                //TIPODATO.Rule = rint
+                //              | rdouble
+                //              | rstring
+                //              | rchar
+                //              | rbool
+                //              | rvoid;
+                return root.ChildNodes[0].Token.ValueString.ToLower();
+        }
+
+        private static string ObtenerTipoDatoValor(ParseTreeNode root, string H_AMBITO)
+        {
+            //VALOR.Rule = C
+            //           |
+            //           | LISTA_ARRAY;
+            if (root.ChildNodes[0].Term.Name.Equals("C"))
+                return AnalizarOperacion(root.ChildNodes[0], H_AMBITO);
+            else if (root.ChildNodes[0].Term.Name.Equals("LISTA_ARRAY"))
+                return "";
+            return "";
+        }
+        #endregion
+
+        #region OPERACIONES
+        private static string AnalizarOperacion(ParseTreeNode root, string H_AMBITO)
+        {
+            string result = null;
+
+            if (root.Term.Name.Equals("OP"))
+            {
+                //OP.Rule = incremento | decremento;
+            }
+            else if (root.Term.Name.Equals("C"))
+            {
+                //C.Rule = C + L + C
+                //       | E + R + E
+                //       | menos + E
+                //       | E;
+                result = ObtenerC(root, H_AMBITO);
+            }
+            return result;
+        }
+
+        private static string ObtenerC(ParseTreeNode root, string H_AMBITO)
+        {
+            string result;
 
             if (root.ChildNodes.Count == 3)
             {
                 if (root.ChildNodes[1].Term.Name.Equals("C"))
                 {
                     //C + L + C
-                    object valor1 = ObtenerC(root.ChildNodes[0], H_AMBITO);
-                    object valor2 = ObtenerC(root.ChildNodes[2], H_AMBITO);
+                    string valor1 = ObtenerC(root.ChildNodes[0], H_AMBITO);
+                    string valor2 = ObtenerC(root.ChildNodes[2], H_AMBITO);
+                    if (EnumTipoDato(valor1) == -1 || EnumTipoDato(valor2) == -1)
+                        return "";
                     result = OperarLogico(valor1, valor2, root.ChildNodes[1]);
                 }
                 else
                 {
                     //E + R + E
-                    object valor1 = ObtenerE(root.ChildNodes[0], H_AMBITO);
-                    object valor2 = ObtenerE(root.ChildNodes[2], H_AMBITO);
+                    string valor1 = ObtenerE(root.ChildNodes[0], H_AMBITO);
+                    string valor2 = ObtenerE(root.ChildNodes[2], H_AMBITO);
+                    if (EnumTipoDato(valor1) == -1 || EnumTipoDato(valor2) == -1)
+                        return "";
                     result = OperarLogico(valor1, valor2, root.ChildNodes[1]);
                 }
             }
             if (root.ChildNodes.Count == 2)
             {
                 //menos + E
-                result = NegarE(root.ChildNodes[1], H_AMBITO);
+                string valor = ObtenerE(root.ChildNodes[1], H_AMBITO);
+                if (EnumTipoDato(valor) == -1)
+                    return "";
+                result = NegarE(root.ChildNodes[0], valor, H_AMBITO);
             }
             else
             {
                 //E;
-                try
-                {
-                    result = ObtenerE(root.ChildNodes[0], H_AMBITO);
-                }
-                catch (Exception ex)
-                {
-                    result = null;
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Columna = 0,
-                        Fila = 0,
-                        Fuente = ex.Source,
-                        Tipo = "Semántico",
-                        Comentario = ex.Message
-                    };
-                    s.Errores.Add(e);
-                }
+                result = ObtenerE(root.ChildNodes[0], H_AMBITO);
             }
             return result;
         }
 
-        private static object ObtenerE(ParseTreeNode root, string H_AMBITO)
+        private static string ObtenerE(ParseTreeNode root, string H_AMBITO)
         {
             if (root.ChildNodes.Count == 3)
             {
-                object valor1 = ObtenerE(root.ChildNodes[0], H_AMBITO);
-                object valor2 = ObtenerE(root.ChildNodes[2], H_AMBITO);
+                //E.Rule = E + mas + E
+                //       | E + menos + E
+                //       | E + por + E
+                //       | E + dividir + E
+                //       | E + modulo + E
+                //       | E + potencia + E
+                string valor1 = ObtenerE(root.ChildNodes[0], H_AMBITO);
+                string valor2 = ObtenerE(root.ChildNodes[2], H_AMBITO);
+                int a = EnumTipoDato(valor1);
+                int b = EnumTipoDato(valor2);
                 int columna = root.ChildNodes[1].Token.Location.Column;
                 int fila = root.ChildNodes[1].Token.Location.Line;
-                if (valor1 == null || valor2 == null)
-                    return null;
+
+                if (a == -1 || b == -1)
+                    return "";
+
                 if (root.ChildNodes[1].Token.ValueString.Equals("+"))
-                    return OperadorSuma(valor1, valor2, columna, fila);
+                    return SUMA[a,b];
                 if (root.ChildNodes[1].Token.ValueString.Equals("-"))
-                    return OperadorResta(valor1, valor2, columna, fila);
+                    return RESTA[a,b];
                 if (root.ChildNodes[1].Token.ValueString.Equals("*"))
-                    return OperadorPor(valor1, valor2, columna, fila);
+                    return MULTIPLICACION[a, b];
                 if (root.ChildNodes[1].Token.ValueString.Equals("/"))
-                    return OperadorDiv(valor1, valor2, columna, fila);
+                    return DIVISION[a, b];
                 if (root.ChildNodes[1].Token.ValueString.Equals("%"))
-                    return OperadorMod(valor1, valor2, columna, fila);
+                    return MODULO[a, b];
                 if (root.ChildNodes[1].Token.ValueString.Equals("^"))
-                    return OperadorPot(valor1, valor2, columna, fila);
+                    return POTENCIA[a, b];
             }
             else
             {
@@ -674,511 +692,36 @@ namespace ChatBot.Compilador
                     return ObtenerE(root.ChildNodes[0], H_AMBITO);
                 //rtrue
                 if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("true"))
-                    return true;
+                    return "boolean";
                 //rfalse
                 if (root.ChildNodes[0].Token.ValueString.ToLower().Equals("false"))
-                    return false;
+                    return "boolean";
                 if (root.ChildNodes[0].Term.Name.Equals("id"))
                 {
                     //id
-                    SingletonListas temp = SingletonListas.GetInstance();
-                    return temp.GetVarValue(root.ChildNodes[0].Token.ValueString, H_AMBITO);
+                    SingletonListas s = SingletonListas.GetInstance();
+                    Variable v = s.GetVariable(root.ChildNodes[0].Token.ValueString, H_AMBITO);
+                    if (v != null)
+                        return v.Tipo;
+                    else
+                        s.NuevoError("Semántico", root.ChildNodes[0].Token.ValueString, root.ChildNodes[0].Token.Location.Line, root.ChildNodes[0].Token.Location.Column, $"La variable {root.ChildNodes[0].Token.ValueString} no se encuentra declarada");
                 }
                 //numentero
-                if (root.ChildNodes[0].Term.Name.ToLower().Equals("int"))
-                    return int.Parse(root.ChildNodes[0].Token.ValueString);
                 //numdecimal
-                if (root.ChildNodes[0].Term.Name.ToLower().Equals("double"))
-                    return double.Parse(root.ChildNodes[0].Token.ValueString);
                 //cadena
-                if (root.ChildNodes[0].Term.Name.ToLower().Equals("string"))
-                    return root.ChildNodes[0].Token.ValueString;
                 //caracter
-                if (root.ChildNodes[0].Term.Name.ToLower().Equals("char"))
-                    return char.Parse(root.ChildNodes[0].Token.ValueString);
+                return root.ChildNodes[0].Term.Name.ToLower();
             }
 
-            return null;
+            return "";
         }
-
-        private static object OperadorSuma(object valor1, object valor2, int columna, int fila)
+        
+        private static string OperarLogico(string valor1, string valor2, ParseTreeNode node)
         {
-            if (valor1 is string || valor2 is string)
-                return valor1.ToString() + valor2.ToString();
-            if (valor1 is int || valor2 is int)
-            {
-                if (valor1 is double)
-                    return (double)valor1 + (int)valor2;
-                if (valor2 is double)
-                    return (int)valor1 + (double)valor2;
-                if (valor1 is char)
-                    return (char)valor1 + (int)valor2;
-                if (valor2 is char)
-                    return (int)valor1 + (char)valor2;
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) + (int)valor2;
-                if (valor2 is bool)
-                    return (int)valor1 + BoolToInt((bool)valor2);
-                return (int)valor1 + (int)valor2;
-            }
-            if (valor1 is double || valor2 is double)
-            {
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) + (double)valor2;
-                if (valor2 is bool)
-                    return (double)valor1 + BoolToInt((bool)valor2);
-                if (valor1 is char)
-                    return (char)valor1 + (double)valor2;
-                if (valor2 is char)
-                    return (double)valor1 + (char)valor2;
-                return (double)valor1 + (double)valor2;
-            }
-            if (valor1 is char || valor2 is char)
-            {
-                if (valor1 is bool || valor2 is bool)
-                {
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Tipo = "Semántico",
-                        Columna = columna,
-                        Fila = fila,
-                        Fuente = "+",
-                        Comentario = "El operador + no opera bool y char"
-                    };
-                    s.Errores.Add(e);
-                    return null;
-                }
-                return (char)valor1 + (char)valor2;
-            }
-            if (valor1 is bool || valor2 is bool)
-                return BoolToInt((bool)valor1) + BoolToInt((bool)valor2);
+            int a = EnumTipoDato(valor1);
+            int b = EnumTipoDato(valor2);
 
-            return null;
-        }
-
-        private static object OperadorResta(object valor1, object valor2, int columna, int fila)
-        {
-            if (valor1 is string || valor2 is string)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "-",
-                    Comentario = "El operador - no opera string"
-                };
-                s.Errores.Add(e);
-                return null;
-            }
-            if (valor1 is int || valor2 is int)
-            {
-                if (valor1 is double)
-                    return (double)valor1 - (int)valor2;
-                if (valor2 is double)
-                    return (int)valor1 - (double)valor2;
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) - (int)valor2;
-                if (valor2 is bool)
-                    return (int)valor1 - BoolToInt((bool)valor2);
-                if (valor1 is char)
-                    return (char)valor1 - (int)valor2;
-                if (valor2 is char)
-                    return (int)valor1 - (char)valor2;
-                return (int)valor1 - (int)valor2;
-            }
-            if (valor1 is double || valor2 is double)
-            {
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) - (double)valor2;
-                if (valor2 is bool)
-                    return (double)valor1 - BoolToInt((bool)valor2);
-                if (valor1 is char)
-                    return (char)valor1 - (double)valor2;
-                if (valor2 is char)
-                    return (double)valor1 - (char)valor2;
-                return (double)valor1 - (double)valor2;
-            }
-            if (valor1 is char || valor2 is char)
-            {
-                if (valor1 is bool || valor2 is bool)
-                {
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Tipo = "Semántico",
-                        Columna = columna,
-                        Fila = fila,
-                        Fuente = "-",
-                        Comentario = "El operador - no opera bool y char"
-                    };
-                    s.Errores.Add(e);
-                    return null;
-                }
-
-                return (int)((char)valor1 - (char)valor2);
-            }
-            if (valor1 is bool || valor2 is bool)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "-",
-                    Comentario = "El operador - no opera bool"
-                };
-                s.Errores.Add(e);
-            }
-
-            return null;
-        }
-
-        private static object OperadorPor(object valor1, object valor2, int columna, int fila)
-        {
-            if (valor1 is string || valor2 is string)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "*",
-                    Comentario = "El operador * no opera string"
-                };
-                s.Errores.Add(e);
-                return null;
-            }
-            if (valor1 is int || valor2 is int)
-            {
-                if (valor1 is double)
-                    return (double)valor1 * (int)valor2;
-                if (valor2 is double)
-                    return (int)valor1 * (double)valor2;
-
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) * (int)valor2;
-                if (valor2 is bool)
-                    return (int)valor1 * BoolToInt((bool)valor2);
-
-
-                if (valor1 is char)
-                    return (char)valor1 * (int)valor2;
-                if (valor2 is char)
-                    return (int)valor1 * (char)valor2;
-
-                return (int)valor1 * (int)valor2;
-            }
-            if (valor1 is double || valor2 is double)
-            {
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) * (double)valor2;
-                if (valor2 is bool)
-                    return (double)valor1 * BoolToInt((bool)valor2);
-
-                if (valor1 is char)
-                    return (char)valor1 * (double)valor2;
-                if (valor2 is char)
-                    return (double)valor1 * (char)valor2;
-
-                return (double)valor1 * (double)valor2;
-            }
-            if (valor1 is char || valor2 is char)
-            {
-                if (valor1 is bool || valor2 is bool)
-                {
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Tipo = "Semántico",
-                        Columna = columna,
-                        Fila = fila,
-                        Fuente = "*",
-                        Comentario = "El operador * no opera bool y char"
-                    };
-                    s.Errores.Add(e);
-                    return null;
-                }
-                return (int)((char)valor1 * (char)valor2);
-            }
-            if (valor1 is bool || valor2 is bool)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "*",
-                    Comentario = "El operador * no opera bool"
-                };
-                s.Errores.Add(e);
-            }
-            return null;
-        }
-
-        private static object OperadorDiv(object valor1, object valor2, int columna, int fila)
-        {
-            if (valor1 is string || valor2 is string)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "/",
-                    Comentario = "El operador / no opera string"
-                };
-                s.Errores.Add(e);
-                return null;
-            }
-            if (valor1 is int || valor2 is int)
-            {
-                if (valor1 is double)
-                    return (double)valor1 / (int)valor2;
-                if (valor2 is double)
-                    return (int)valor1 / (double)valor2;
-
-                if (valor1 is bool)
-                    return (double)(BoolToInt((bool)valor1) / (int)valor2);
-                if (valor2 is bool)
-                    return (double)((int)valor1 / BoolToInt((bool)valor2));
-
-
-                if (valor1 is char)
-                    return (double)((char)valor1 / (int)valor2);
-                if (valor2 is char)
-                    return (double)((int)valor1 / (char)valor2);
-
-                return (double)((int)valor1 / (int)valor2);
-            }
-            if (valor1 is double || valor2 is double)
-            {
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) / (double)valor2;
-                if (valor2 is bool)
-                    return (double)valor1 / BoolToInt((bool)valor2);
-
-                if (valor1 is char)
-                    return (char)valor1 / (double)valor2;
-                if (valor2 is char)
-                    return (double)valor1 / (char)valor2;
-
-                return (double)valor1 / (double)valor2;
-            }
-            if (valor1 is char || valor2 is char)
-            {
-                if (valor1 is bool || valor2 is bool)
-                {
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Tipo = "Semántico",
-                        Columna = columna,
-                        Fila = fila,
-                        Fuente = "/",
-                        Comentario = "El operador / no opera bool y char"
-                    };
-                    s.Errores.Add(e);
-                    return null;
-                }
-                return (double)((char)valor1 / (char)valor2);
-            }
-            if (valor1 is bool || valor2 is bool)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "/",
-                    Comentario = "El operador / no opera bool"
-                };
-                s.Errores.Add(e);
-            }
-            return null;
-        }
-
-        private static object OperadorMod(object valor1, object valor2, int columna, int fila)
-        {
-            if (valor1 is string || valor2 is string)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "%",
-                    Comentario = "El operador % no opera string"
-                };
-                s.Errores.Add(e);
-                return null;
-            }
-            if (valor1 is int || valor2 is int)
-            {
-                if (valor1 is double)
-                    return (double)valor1 % (int)valor2;
-                if (valor2 is double)
-                    return (int)valor1 % (double)valor2;
-
-                if (valor1 is bool)
-                    return (double)(BoolToInt((bool)valor1) % (int)valor2);
-                if (valor2 is bool)
-                    return (double)((int)valor1 % BoolToInt((bool)valor2));
-
-
-                if (valor1 is char)
-                    return (double)((char)valor1 % (int)valor2);
-                if (valor2 is char)
-                    return (double)((int)valor1 % (char)valor2);
-
-                return (double)((int)valor1 % (int)valor2);
-            }
-            if (valor1 is double || valor2 is double)
-            {
-                if (valor1 is bool)
-                    return BoolToInt((bool)valor1) % (double)valor2;
-                if (valor2 is bool)
-                    return (double)valor1 % BoolToInt((bool)valor2);
-
-                if (valor1 is char)
-                    return (char)valor1 % (double)valor2;
-                if (valor2 is char)
-                    return (double)valor1 % (char)valor2;
-
-                return (double)valor1 % (double)valor2;
-            }
-            if (valor1 is char || valor2 is char)
-            {
-                if (valor1 is bool || valor2 is bool)
-                {
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Tipo = "Semántico",
-                        Columna = columna,
-                        Fila = fila,
-                        Fuente = "%",
-                        Comentario = "El operador % no opera bool y char"
-                    };
-                    s.Errores.Add(e);
-                    return null;
-                }
-                return (double)((char)valor1 % (char)valor2);
-            }
-            if (valor1 is bool || valor2 is bool)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "%",
-                    Comentario = "El operador % no opera bool"
-                };
-                s.Errores.Add(e);
-            }
-            return null;
-        }
-
-        private static object OperadorPot(object valor1, object valor2, int columna, int fila)
-        {
-            if (valor1 is string || valor2 is string)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "^",
-                    Comentario = "El operador ^ no opera string"
-                };
-                s.Errores.Add(e);
-                return null;
-            }
-            if (valor1 is int || valor2 is int)
-            {
-                if (valor1 is double)
-                    return Math.Pow((double)valor1, (int)valor2);
-                if (valor2 is double)
-                    return Math.Pow((int)valor1, (double)valor2);
-
-                if (valor1 is char)
-                    return Math.Pow((char)valor1, (int)valor2);
-                if (valor2 is char)
-                    return Math.Pow((int)valor1, (char)valor2);
-
-                if (valor1 is bool)
-                    return Math.Pow(BoolToInt((bool)valor1), (int)valor2);
-                if (valor2 is bool)
-                    return Math.Pow((int)valor1, BoolToInt((bool)valor2));
-
-                return Math.Pow((int)valor1, (int)valor2);
-
-              
-
-              
-            }
-            if (valor1 is double || valor2 is double)
-            {
-                if (valor1 is bool)
-                    return Math.Pow(BoolToInt((bool)valor1), (double)valor2);
-                if (valor2 is bool)
-                    return Math.Pow((double)valor1, BoolToInt((bool)valor2));
-
-                if (valor1 is char)
-                    return Math.Pow((char)valor1, (double)valor2);
-                if (valor2 is char)
-                    return Math.Pow((double)valor1, (char)valor2);
-
-                return Math.Pow((double)valor1, (double)valor2);
-            }
-            if (valor1 is char || valor2 is char)
-            {
-                if (valor1 is bool || valor2 is bool)
-                {
-                    SingletonListas s = SingletonListas.GetInstance();
-                    Error e = new Error()
-                    {
-                        Tipo = "Semántico",
-                        Columna = columna,
-                        Fila = fila,
-                        Fuente = "^",
-                        Comentario = "El operador ^ no opera bool y char"
-                    };
-                    s.Errores.Add(e);
-                    return null;
-                }
-                return Math.Pow((char)valor1, (char)valor2);
-            }
-            if (valor1 is bool || valor2 is bool)
-            {
-                SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = columna,
-                    Fila = fila,
-                    Fuente = "^",
-                    Comentario = "El operador ^ no opera bool"
-                };
-                s.Errores.Add(e);
-            }
-            return null;
-        }
-
-        private static object OperarLogico(object valor1, object valor2, ParseTreeNode node)
-        {
-            if (!(valor1 is bool) && !(valor2 is bool))
+            if (a != EnumTipoDato("boolean") && b != EnumTipoDato("boolean"))
             {
                 SingletonListas s = SingletonListas.GetInstance();
                 Error e = new Error()
@@ -1190,154 +733,48 @@ namespace ChatBot.Compilador
                     Comentario = $"El operador {node.Token.ValueString} solo admite bool"
                 };
                 s.Errores.Add(e);
-                return null;
+                return "";
             }
-            switch (node.Token.ValueString)
-            {
-                case "||":
-                    return (bool)valor1 || (bool)valor2;
-                case "&&":
-                    return (bool)valor1 && (bool)valor2;
-                case "^":
-                    return (bool)valor1 ^ (bool)valor2;
-                case "!":
-                    return !(bool)valor1;
-            }
-            return null;
+
+            return "boolean";
         }
 
-        private static object OperarRelacional(object valor1, object valor2, ParseTreeNode node)
+        private static string OperarRelacional(string valor1, string valor2, ParseTreeNode node, string H_AMBITO)
         {
-            switch (node.Token.ValueString)
-            {
-                case "==":
-                    if (valor1 is int && valor2 is int)
-                        return ((int)valor1 == (int)valor2) ? 1 : 0;
-                    if (valor1 is double && valor2 is double)
-                        return ((double)valor1 == (double)valor2) ? 1 : 0;
-                    if (valor1 is char && valor2 is char)
-                        return ((char)valor1 == (char)valor2) ? 1 : 0;
-                    if (valor1 is bool && valor2 is bool)
-                        return ((bool)valor1 == (bool)valor2) ? 1 : 0;
-                    break;
-                case "!=":
-                    if (valor1 is int && valor2 is int)
-                        return ((int)valor1 != (int)valor2) ? 1 : 0;
-                    if (valor1 is double && valor2 is double)
-                        return ((double)valor1 != (double)valor2) ? 1 : 0;
-                    if (valor1 is char && valor2 is char)
-                        return ((char)valor1 != (char)valor2) ? 1 : 0;
-                    if (valor1 is bool && valor2 is bool)
-                        return ((bool)valor1 != (bool)valor2) ? 1 : 0;
-                    break;
-                case "<":
-                    if (valor1 is int && valor2 is int)
-                        return ((int)valor1 < (int)valor2) ? 1 : 0;
-                    if (valor1 is double && valor2 is double)
-                        return ((double)valor1 < (double)valor2) ? 1 : 0;
-                    if (valor1 is char && valor2 is char)
-                        return ((char)valor1 < (char)valor2) ? 1 : 0;
-                    if (valor1 is bool && valor2 is bool)
-                        return ((int)valor1 < (int)valor2) ? 1 : 0;
-                    break;
-                case "<=":
-                    if (valor1 is int && valor2 is int)
-                        return ((int)valor1 <= (int)valor2) ? 1 : 0;
-                    if (valor1 is double && valor2 is double)
-                        return ((double)valor1 <= (double)valor2) ? 1 : 0;
-                    if (valor1 is char && valor2 is char)
-                        return ((char)valor1 <= (char)valor2) ? 1 : 0;
-                    if (valor1 is bool && valor2 is bool)
-                        return ((int)valor1 <= (int)valor2) ? 1 : 0;
-                    break;
-                case ">":
-                    if (valor1 is int && valor2 is int)
-                        return ((int)valor1 > (int)valor2) ? 1 : 0;
-                    if (valor1 is double && valor2 is double)
-                        return ((double)valor1 > (double)valor2) ? 1 : 0;
-                    if (valor1 is char && valor2 is char)
-                        return ((char)valor1 > (char)valor2) ? 1 : 0;
-                    if (valor1 is bool && valor2 is bool)
-                        return ((int)valor1 > (int)valor2) ? 1 : 0;
-                    break;
-                case ">=":
-                    if (valor1 is int && valor2 is int)
-                        return ((int)valor1 >= (int)valor2) ? 1 : 0;
-                    if (valor1 is double && valor2 is double)
-                        return ((double)valor1 >= (double)valor2) ? 1 : 0;
-                    if (valor1 is char && valor2 is char)
-                        return ((char)valor1 >= (char)valor2) ? 1 : 0;
-                    if (valor1 is bool && valor2 is bool)
-                        return ((int)valor1 >= (int)valor2) ? 1 : 0;
-                    break;
-            }
-            if (valor1 is string || valor2 is string)
+            if (valor1.Equals(valor2))
+                return "boolean";
+            else
             {
                 SingletonListas s = SingletonListas.GetInstance();
-                Error e = new Error()
-                {
-                    Tipo = "Semántico",
-                    Columna = node.Token.Location.Column,
-                    Fila = node.Token.Location.Line,
-                    Fuente = node.Token.ValueString,
-                    Comentario = $"El operador {node.Token.ValueString} no admite el tipo {valor1.GetType()} con {valor2.GetType()}"
-                };
-                s.Errores.Add(e);
-                return null;
-            }
-            return null;
-        }
-        
-        private static object DefaultValue(string tipo)
-        {
-
-            if (tipo.Equals("int"))
-                return 0;
-            if (tipo.Equals("double"))
-                return 0.0;
-            if (tipo.Equals("string"))
+                s.NuevoError(H_AMBITO, node.Token.ValueString, node.Token.Location.Line, node.Token.Location.Column, $"El operador {node.Token.ValueString} no admite comparación {valor1} y {valor2}");
                 return "";
-            if (tipo.Equals("char"))
-                return '\0';
-            if (tipo.Equals("boolean"))
-                return false;
-            return 0;
-        }
-
-
-        private static bool VerificarTipo(string tipo, object valor)
-        {
-            switch (tipo)
-            {
-                case "int":
-                    if (!(valor is string))
-                    {
-                        if (valor is int)
-                            return true;
-
-                    }  return false;
-                case "double":
-                    if (!(valor is string))
-                    {
-
-                        if (valor is double)
-                            return true;
-                    }
-                    return false; 
-                case "string":
-                    return valor is string;
-                case "char":
-                    return (valor is char) || (valor is int);
-                case "boolean":
-                    return (valor is bool) || (valor is int);
             }
-            return false;
         }
-
-        private static int BoolToInt(bool valor)
+                
+        private static string NegarE(ParseTreeNode root, string valor, string H_AMBITO)
         {
-            return (valor) ? 1 : 0;
+            // -E
+            int tipo = EnumTipoDato(valor);
+            if (tipo == EnumTipoDato("int") || tipo == EnumTipoDato("double") || tipo == EnumTipoDato("boolean"))
+                return valor;
+            SingletonListas s = SingletonListas.GetInstance();
+            s.NuevoError(H_AMBITO, root.Token.ValueString, root.Token.Location.Line, root.Token.Location.Column, $"No se puede negar {valor}");
+            return "";
         }
+        #endregion
 
+        #region METODOS
+        private static void AnalizarMetodos(ParseTreeNode root)
+        {
+
+        }
+        #endregion
+
+        #region SENTENCIAS
+        private static void AnalizarSentencias(ParseTreeNode root)
+        {
+
+        }
+        #endregion
     }
 }

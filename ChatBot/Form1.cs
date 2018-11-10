@@ -20,7 +20,7 @@ namespace ChatBot
             s.Errores.Clear();
             richTextBoxRestult.Clear();
             string texto = richTextBoxSource.Text;
-            ParseTreeNode raiz = Analizador.Analizar(texto);
+            ParseTreeNode raiz = Analizador.AnalisisLexicoSintactico(texto);
             if (raiz != null)
             {
                 Analizador.GenerarImagen(raiz);

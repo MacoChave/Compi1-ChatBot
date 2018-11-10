@@ -18,6 +18,8 @@ namespace ChatBot.Objeto
 
         public Ambito()
         {
+            Parametros = new List<Variable>();
+            Variables = new List<Variable>();
         }
 
         public object GetVarValue(string nombre)

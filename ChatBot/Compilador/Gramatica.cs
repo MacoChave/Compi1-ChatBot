@@ -1,4 +1,5 @@
 ﻿using System;
+using ChatBot.Objeto;
 using Irony.Parsing;
 
 namespace ChatBot.Compilador
@@ -360,14 +361,17 @@ namespace ChatBot.Compilador
 
 		public override void ReportParseError(ParsingContext context)
 		{
+            SingletonListas s = SingletonListas.GetInstance();
 			base.ReportParseError(context);
 			string error = context.CurrentToken.ValueString;
+            string tipo;
 			int fila;
 			int columna;
 			string descripcion = "";
 
 			if (error.Contains("Invalid character"))
 			{
+                tipo = "Léxico";
 				fila = context.Source.Location.Line;
 				columna = context.Source.Location.Column;
 
@@ -378,12 +382,20 @@ namespace ChatBot.Compilador
 			}
 			else
 			{
-				fila = context.Source.Location.Line;
+                tipo = "Sintáctico";
+                fila = context.Source.Location.Line;
 				columna = context.Source.Location.Column;
 				descripcion = "Se esperaba: " + context.GetExpectedTermSet().ToString();
 			}
-
-            Console.WriteLine($"FILA:{fila} COLUMNA:{columna} DESCRIPCION:{descripcion}");
+            Error e = new Error()
+            {
+                Tipo = tipo,
+                Fila = fila,
+                Columna = columna,
+                Comentario = descripcion,
+                Fuente = error
+            };
+            s.NuevoError(e);
 		}
 	}
 }

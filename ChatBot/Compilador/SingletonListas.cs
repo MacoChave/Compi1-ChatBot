@@ -13,6 +13,18 @@ namespace ChatBot.Compilador
             Variables = new List<Variable>();
             Errores = new List<Error>();
             Ambitos = new List<Ambito>();
+            CrearAmbitoGlobal();
+        }
+
+        internal void LimpiarListas()
+        {
+            Ambitos.Clear();
+            Errores.Clear();
+            CrearAmbitoGlobal();
+        }
+
+        private void CrearAmbitoGlobal()
+        {
             Ambito a = new Ambito()
             {
                 Id = "GLOBAL",
@@ -63,10 +75,16 @@ namespace ChatBot.Compilador
             Errores.Add(e);
         }
 
+        internal void NuevoError(Error e)
+        {
+            Errores.Add(e);
+        }
+
         internal bool VerificarId(Variable v, string ambito)
         {
             Variable var = GetVariable(v.Id, ambito);
-            return var == null;
+            if (var == null) return true;
+            return !var.Ambito.Equals(ambito);
         }
 
         internal Variable GetVariable(string id, string ambito)
@@ -90,6 +108,11 @@ namespace ChatBot.Compilador
         {
             Ambito a = GetAmbito(ambito);
             a.Variables.AddRange(vars);
+        }
+
+        internal void AlmacenarParametros(List<Variable> pars, string nombre)
+        {
+
         }
     }
 }

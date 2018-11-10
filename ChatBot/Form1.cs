@@ -16,8 +16,7 @@ namespace ChatBot
         private void buttonAnalizar_Click(object sender, System.EventArgs e)
         {
             SingletonListas s = SingletonListas.GetInstance();
-            s.Variables.Clear();
-            s.Errores.Clear();
+            s.LimpiarListas();
             richTextBoxRestult.Clear();
             string texto = richTextBoxSource.Text;
             ParseTreeNode raiz = Analizador.AnalisisLexicoSintactico(texto);

@@ -856,7 +856,7 @@ namespace ChatBot.Compilador
             //SENTENCIARETURN.Rule = C
             //                      |;
             SingletonListas s = SingletonListas.GetInstance();
-            if (root.ChildNodes.Count > 0)
+            if (root.ChildNodes.Count == 1)
             {
                 string tipoDatoValor = ObtenerC(root.ChildNodes[0], H_AMBITO);
                 if (!tipoDatoValor.Equals(tipoDato))
@@ -867,7 +867,7 @@ namespace ChatBot.Compilador
                         Fila = 0,
                         Columna = 0,
                         Fuente = "return",
-                        Comentario = $"El procedimiento {tipoDato} no puede retornar {tipoDatoValor}"
+                        Comentario = $"{H_AMBITO} retorna {tipoDato} no {tipoDatoValor}"
                     };
                     s.NuevoError(e);
                 }
@@ -882,7 +882,7 @@ namespace ChatBot.Compilador
                         Fila = 0,
                         Columna = 0,
                         Fuente = "return",
-                        Comentario = $"El procedimiento {tipoDato} tiene que retornar algo"
+                        Comentario = $"{H_AMBITO} esperaba retornar {tipoDato}"
                     };
                     s.NuevoError(e);
                 }
@@ -892,7 +892,7 @@ namespace ChatBot.Compilador
         private static void SentenciaFor(ParseTreeNode root, string tipoDato, string H_AMBITO, bool controlFlujo = false)
         {
             //SENTENCIAFOR.Rule = rfor + id + TIPODATO + E + C + OP + SENTENCIAS;
-
+            Sentencia(root.ChildNodes[6], tipoDato, H_AMBITO, true);
         }
 
         private static void SentenciaIf(ParseTreeNode root, string tipoDato, string H_AMBITO, bool controlFlujo = false)
@@ -900,37 +900,85 @@ namespace ChatBot.Compilador
             if (root.Term.Name.Equals("SENTENCIAIF"))
             {
                 //SENTENCIAIF.Rule = rif + SENTENCIAIFAUX;
-
+                SentenciaIf(root.ChildNodes[1], tipoDato, H_AMBITO, controlFlujo);
             }
             else if (root.Term.Name.Equals("SENTENCIAIFAUX"))
             {
                 //SENTENCIAIFAUX.Rule = C + SENTENCIAS + SENTENCIAELSEIF;
-
+                SingletonListas s = SingletonListas.GetInstance();
+                string comparacion = ObtenerC(root.ChildNodes[0], H_AMBITO);
+                if (!comparacion.Equals("boolean"))
+                {
+                    Error e = new Error()
+                    {
+                        Tipo = "Semántico",
+                        Fila = 0,
+                        Columna = 0,
+                        Fuente = "If",
+                        Comentario = "Se esperaba boolean"
+                    };
+                    s.NuevoError(e);
+                }
+                Sentencia(root.ChildNodes[1], tipoDato, H_AMBITO, controlFlujo);
+                SentenciaIf(root.ChildNodes[2], tipoDato, H_AMBITO, controlFlujo);
             }
             else if (root.Term.Name.Equals("SENTENCIAELSEIF"))
             {
                 //SENTENCIAELSEIF.Rule = relse + SENTPRIMA
                 //                      |;
-
+                if (root.ChildNodes.Count == 2)
+                    SentenciaIf(root.ChildNodes[1], tipoDato, H_AMBITO, controlFlujo);
+                return;
             }
             else if (root.Term.Name.Equals("SENTPRIMA"))
             {
                 //SENTPRIMA.Rule = rif + SENTENCIAIFAUX
                 //                | SENTENCIAS;
-
+                if (root.ChildNodes.Count == 2)
+                    SentenciaIf(root.ChildNodes[1], tipoDato, H_AMBITO, controlFlujo);
+                else
+                    Sentencia(root.ChildNodes[0], tipoDato, H_AMBITO, controlFlujo);
             }
         }
 
         private static void SentenciaWhile(ParseTreeNode root, string tipoDato, string H_AMBITO, bool controlFlujo = false)
         {
             //SENTENCIAWHILE.Rule = rwhile + C + SENTENCIAS;
-
+            SingletonListas s = SingletonListas.GetInstance();
+            string comparacion = ObtenerC(root.ChildNodes[1], H_AMBITO);
+            if (!comparacion.Equals("boolean"))
+            {
+                Error e = new Error()
+                {
+                    Tipo = "Semántico",
+                    Fila = root.ChildNodes[0].Token.Location.Line,
+                    Columna = root.ChildNodes[0].Token.Location.Column,
+                    Fuente = "while",
+                    Comentario = $"Se esperaba tipo de dato boolean"
+                };
+                s.NuevoError(e);
+            }
+            Sentencia(root.ChildNodes[2], tipoDato, H_AMBITO, true);
         }
 
         private static void SentenciaDoWhile(ParseTreeNode root, string tipoDato, string H_AMBITO, bool controlFlujo = false)
         {
             //SENTENCIADOWHILE.Rule = rdo + SENTENCIAS + rwhile + C;
-
+            SingletonListas s = SingletonListas.GetInstance();
+            Sentencia(root.ChildNodes[1], tipoDato, H_AMBITO, true);
+            string comparacion = ObtenerC(root.ChildNodes[3], H_AMBITO);
+            if (!comparacion.Equals("boolean"))
+            {
+                Error e = new Error()
+                {
+                    Tipo = "Semántico",
+                    Fila = root.ChildNodes[2].Token.Location.Line,
+                    Columna = root.ChildNodes[2].Token.Location.Column,
+                    Fuente = "do while",
+                    Comentario = $"Se esperaba tipo de dato boolean"
+                };
+                s.NuevoError(e);
+            }
         }
 
         private static void SentenciaSwitch(ParseTreeNode root, string tipoDato, string H_AMBITO, bool controlFlujo = false)
@@ -938,7 +986,7 @@ namespace ChatBot.Compilador
             if (root.Term.Name.Equals("SENTENCIASWITCH"))
             {
                 //SENTENCIASWITCH.Rule = rswitch + E + SENTENCIAS;
-
+                Sentencia(root.ChildNodes[2], tipoDato, H_AMBITO, true);
             }
             else if (root.Term.Name.Equals("CONTENIDOSWITCH"))
             {
